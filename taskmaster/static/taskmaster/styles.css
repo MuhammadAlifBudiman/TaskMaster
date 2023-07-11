@@ -286,6 +286,7 @@ h6 span{
 .btn.btn-primary.btn-lg {
   font-size: 2em;
   height: 25vh;
+  width: 100%;
 }
 
 .logout:hover, .delete-task:hover, .btn.btn-danger {
@@ -355,12 +356,35 @@ span.badge.bg-light.not-completed {
 .task-description .full-text {
   display: none;
 }
+
 .task-description .see-more {
   color: blue;
   cursor: pointer;
 }
+
 .task-description .see-less {
   display: none;
   color: blue;
   cursor: pointer;
+}
+
+.bottom-80 {
+  bottom: 80%;
+}
+
+.col-md-6.text-center h5.not-complete{
+  color: #c4c3ca;
+  animation: white-to-red 2s infinite;
+}
+
+@keyframes white-to-red {
+  0% {
+    color: #c4c3ca;
+  }
+  50% {
+    color: red;
+  }
+  100% {
+    color: #c4c3ca;
+  }
 }

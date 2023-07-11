@@ -35,16 +35,20 @@ def index(request):
 
     completed_daily_tasks = Task.objects.filter(completed=True, daily=True, user=request.user).count()
     total_daily_tasks = Task.objects.filter(daily=True, user=request.user).count()
+    remaining_daily_tasks = total_daily_tasks - completed_daily_tasks
     completed_weekly_tasks = Task.objects.filter(completed=True, weekly=True, user=request.user).count()
     total_weekly_tasks = Task.objects.filter(weekly=True, user=request.user).count()
+    remaining_weekly_tasks = total_weekly_tasks - completed_weekly_tasks
     completed_all_tasks = (completed_daily_tasks+completed_weekly_tasks) == (total_daily_tasks+total_weekly_tasks) and (total_daily_tasks+total_weekly_tasks) != 0
 
     return render(request, 'taskmaster/index.html', 
             {
                 'completed_daily_tasks': completed_daily_tasks, 
                 'total_daily_tasks': total_daily_tasks,
+                'remaining_daily_tasks': remaining_daily_tasks,
                 'completed_weekly_tasks': completed_weekly_tasks,
                 'total_weekly_tasks': total_weekly_tasks,
+                'remaining_weekly_tasks': remaining_weekly_tasks,
                 'completed_all_tasks': completed_all_tasks
             })
 
