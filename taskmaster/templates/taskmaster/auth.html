@@ -1,0 +1,117 @@
+{% extends 'taskmaster/layout.html' %}
+{% block content %}
+<div class="section">
+    <div class="container">
+        <div class="row full-height justify-content-center">
+            <div class="col-12 text-center align-self-center">
+                <div class="section pb-5 pt-2 pt-sm-2 text-center">
+                    <h6 class="mb-0 pb-3"><span>Log In </span><span>Sign Up</span></h6>
+                    <input class="checkbox" type="checkbox" id="reg-log" name="reg-log" {% if checked %}checked{% endif %} />
+                    <label for="reg-log"></label>
+                    <div class="card-3d-wrap mx-auto">
+                        <div class="card-3d-wrapper">
+                            <div class="card-front">
+                                <div class="center-wrap">
+                                    <div class="section text-center">
+                                        <h4 class="mb-4 pb-3">Log In</h4>
+                                        <form id="login-form" method="POST" action="{% url 'login' %}">
+                                            {% csrf_token %}
+                                            <div class="form-group">
+                                                <input type="text" name="{{ login_form.username.html_name }}" class="form-style {{ login_form.username.field.widget.attrs.class }} {% if login_form.username.errors %} is-invalid{% endif %}" placeholder="Your Username" id="{{ login_form.username.id_for_label }}" {% if login_form.username.field.required %}required{% endif %} autocomplete="nope" >
+                                                <i class="input-icon uil uil-at"></i>
+                                                {% if login_form.username.errors %}
+                                                <div class="invalid-feedback">
+                                                    {% for error in login_form.username.errors %}
+                                                    <p class="mb-0">{{ error }}</p>
+                                                    {% endfor %}
+                                                </div>
+                                                {% endif %}
+                                            </div>
+                                            <div class="form-group mt-2">
+                                                <div class="input-group">
+                                                    <input type="password" name="{{ login_form.password.html_name }}" class="form-style {{ login_form.password.field.widget.attrs.class }} {% if login_form.password.errors %} is-invalid{% endif %}" placeholder="Your Password" id="{{ login_form.password.id_for_label }}" {% if login_form.username.field.required %}required{% endif %} autocomplete="new-password">
+                                                    <i class="input-icon uil uil-lock-alt"></i>
+                                                    <i class="uil uil-eye-slash password-icon password-toggle" type="button" id="togglePassword" data-target="{{ login_form.password.id_for_label }}"></i>
+                                                </div>
+                                                {% if login_form.password.errors %}
+                                                <div class="invalid-feedback">
+                                                    {% for error in login_form.password.errors %}
+                                                    <p class="mb-0">{{ error }}</p>
+                                                    {% endfor %}
+                                                </div>
+                                                {% endif %}
+                                            </div>
+                                            <button type="submit" class="btn mt-4">Log In</button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="card-back">
+                                <div class="center-wrap">
+                                    <div class="section text-center">
+                                        <h4 class="mb-4 pb-3">Sign Up</h4>
+                                        <form id="register-form" method="POST" action="{% url 'register' %}">
+                                            {% csrf_token %}
+                                            <div class="form-group">
+                                                <input type="text" name="{{ register_form.fullname.html_name }}" class="form-style {{ register_form.fullname.field.widget.attrs.class }} {% if register_form.fullname.errors %} is-invalid{% endif %}" placeholder="Your Full Name" id="{{ register_form.fullname.id_for_label }}" autocomplete="nope" {% if register_form.fullname.field.required %}required{% endif %} value="{% if register_form.fullname.value %}{{ register_form.fullname.value }}{% endif %}">
+                                                <i class="input-icon uil uil-user"></i>
+                                                {% if register_form.fullname.errors %}
+                                                <div class="invalid-feedback">
+                                                    {% for error in register_form.fullname.errors %}
+                                                    <p class="mb-0">{{ error }}</p>
+                                                    {% endfor %}
+                                                </div>
+                                                {% endif %}
+                                            </div>
+                                            <div class="form-group mt-2">
+                                                <input type="text" name="{{ register_form.username.html_name }}" class="form-style {{ register_form.username.field.widget.attrs.class }} {% if register_form.username.errors %} is-invalid{% endif %}" placeholder="Your username" id="{{ register_form.username.id_for_label }}2" autocomplete="nope" {% if register_form.username.field.required %}required{% endif %} value="{% if register_form.username.value %}{{ register_form.username.value }}{% endif %}">
+                                                <i class="input-icon uil uil-at"></i>
+                                                {% if register_form.username.errors %}
+                                                <div class="invalid-feedback">
+                                                    {% for error in register_form.username.errors %}
+                                                    <p class="mb-0">{{ error }}</p>
+                                                    {% endfor %}
+                                                </div>
+                                                {% endif %}
+                                            </div>
+                                            <div class="form-group mt-2">
+                                                <div class="input-group">
+                                                    <input type="password" name="{{ register_form.password1.html_name }}" class="form-style {{ register_form.password1.field.widget.attrs.class }} {% if register_form.password1.errors %} is-invalid{% endif %}" placeholder="Your Password" id="{{ register_form.password1.id_for_label }}" autocomplete="new-password" {% if register_form.password1.field.required %}required{% endif %}>
+                                                    <i class="input-icon uil uil-lock-alt"></i>
+                                                    <i class="uil uil-eye-slash password-icon password-toggle" type="button" id="{{ register_form.password1.id_for_label }}" data-target="{{ register_form.password1.id_for_label }}"></i>
+                                                    {% if register_form.password1.errors %}
+                                                    <div class="invalid-feedback">
+                                                        {% for error in register_form.password1.errors %}
+                                                        <p class="mb-0">{{ error }}</p>
+                                                        {% endfor %}
+                                                    </div>
+                                                    {% endif %}
+                                                </div>
+                                            </div>
+                                            <div class="form-group mt-2">
+                                                <div class="input-group">
+                                                    <input type="password" name="{{ register_form.password2.html_name }}" class="form-style {{ register_form.password2.field.widget.attrs.class }} {% if register_form.password2.errors %} is-invalid{% endif %}" placeholder="Your Password" id="{{ register_form.password2.id_for_label }}" autocomplete="new-password" {% if register_form.password2.field.required %}required{% endif %}>
+                                                    <i class="input-icon uil uil-lock-alt"></i>
+                                                    <i class="uil uil-eye-slash password-icon password-toggle" type="button" id="{{ register_form.password2.id_for_label }}" data-target="{{ register_form.password2.id_for_label }}"></i>
+                                                    {% if register_form.password2.errors %}
+                                                    <div class="invalid-feedback password">
+                                                        {% for error in register_form.password2.errors %}
+                                                        <p class="mb-0">{{ error }}</p>
+                                                        {% endfor %}
+                                                    </div>
+                                                    {% endif %}
+                                                </div>
+                                            </div>
+                                            <button type="submit" class="btn mt-4">Sign Up</button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

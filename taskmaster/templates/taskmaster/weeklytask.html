@@ -1,0 +1,197 @@
+{% extends 'taskmaster/layout.html' %}
+
+{% block content %}
+
+<div class="container container-task">
+  <div class="row justify-content-center mt-5">
+    <div class="col-md-12">
+      <div class="card">
+        <div class="card-header">
+          <h2>My Weekly Task List 
+        		{% if completed_tasks == total_tasks %}
+          	<span class="badge rounded-pill bg-light complete-all-task">
+	        		({{ completed_tasks }}/{{ total_tasks }})
+	        		<i class="uil uil-check-circle check-icon"></i>
+          	</span>
+        		{% else %}
+          	<span class="badge rounded-pill bg-light not-completed">
+	        		({{ completed_tasks }}/{{ total_tasks }})
+	        		<i class="uil uil-times-circle cross-icon"></i>
+          	</span>
+        		{% endif %}
+          </h2>
+        </div>
+        <div class="card-body">
+        	<a type="button" href="{% url 'index' %}" class="btn btn-primary mb-2">Home</a>
+			<button type="button" class="btn btn-primary mb-2" data-bs-toggle="modal" data-bs-target="#addTaskModal">Add Weekly Task</button>
+			<div class="table-responsive">
+	          <table id="task-table" class="table">
+	            <thead>
+	              <tr>
+	                <th>Num</th>
+	                <th>Title</th>
+	                <th>Description</th>
+	                <th>Created At</th>
+	                <th>Execution Time</th>
+	                <th>Actions</th>
+	              </tr>
+	            </thead>
+	            <tbody>
+	              <!-- Task items will be dynamically populated here -->
+		            {% for task in tasks %}
+		            <tr data-id="{{ task.id }}" class="{% if task.completed %}completed{% endif %}">
+		              <td>{{ forloop.counter }}</td>
+		              <td>{{ task.title }}</td>
+								  <td>
+								    <div class="task-description">
+								      <p class="truncated-text">{{ task.description|truncatechars:100 }}</p>
+								      {% if task.description|length > 100 %}
+								      <a href="#" class="see-more text-decoration-none">See More</a>
+								      {% endif %}
+								      <p class="full-text">{{ task.description }}</p>
+								      {% if task.description|length > 100 %}
+								      <a href="#" class="see-less text-decoration-none">Less</a>
+								      {% endif %}
+								    </div>
+								  </td>
+		              <td>{{ task.created_at|date:'F d, Y' }}</td>
+		              <td>{{ task.execution_day }}, {{ task.execution_time }}</td>
+		              <td>
+		                <button class="btn btn-sm btn-primary edit-task" data-bs-toggle="modal" data-bs-target="#editTaskModal">Edit</button>
+										<!-- Edit Task Modal -->
+										<div class="modal fade" id="editTaskModal" tabindex="-1" aria-labelledby="editTaskModalLabel" aria-hidden="true">
+										  <div class="modal-dialog modal-dialog-centered">
+										    <div class="modal-content">
+										      <div class="modal-header">
+										        <h5 class="modal-title" id="editTaskModalLabel">Edit Task</h5>
+										        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+										      </div>
+										      <div class="modal-body">
+										        <!-- Add Task Form -->
+										        <form id="addTaskForm" method="POST" action="{% url 'edit_task' task.id %}">
+										        	{% csrf_token %}
+										          <div class="mb-3">
+										            <label for="title" class="form-label">Title</label>
+										            <input type="text" class="form-control" id="title" name="title" value="{{ task.title }}" required>
+										          </div>
+										          <div class="mb-3">
+										            <label for="description" class="form-label">Description</label>
+										            <textarea class="form-control" id="description" name="description" rows="3">{% if task.description %}{{ task.description }}{% endif %}</textarea>
+										          </div>
+										          <div class="mb-3">
+										            <label for="execution_day" class="form-label">Execution Day</label>
+										            <select class="form-control select-day" id="execution_day" name="execution_day" required>
+										            	<option value="" disabled>Select Day</option>
+										            	<option value="Sunday" {% if task.execution_day == 'Sunday' %}selected{% endif %}>Sunday</option>
+										            	<option value="Monday" {% if task.execution_day == 'Monday' %}selected{% endif %}>Monday</option>
+										            	<option value="Tuesday" {% if task.execution_day == 'Tuesday' %}selected{% endif %}>Tuesday</option>
+										            	<option value="Wednesday" {% if task.execution_day == 'Wednesday' %}selected{% endif %}>Wednesday</option>
+										            	<option value="Thursday" {% if task.execution_day == 'Thursday' %}selected{% endif %}>Thursday</option>
+										            	<option value="Friday" {% if task.execution_day == 'Friday' %}selected{% endif %}>Friday</option>
+										            	<option value="Saturday" {% if task.execution_day == 'Saturday' %}selected{% endif %}>Saturday</option>
+										            </select>
+										          </div>
+										          <div class="mb-3">
+										            <label for="execution_time">Execution Time</label>
+										            <input type="time" class="form-control" name="execution_time" value="{{ task.execution_time|time:'H:i' }}" required>
+										          </div>
+										          <button type="submit" class="btn btn-primary">Edit</button>
+										        </form>
+										      </div>
+										    </div>
+										  </div>
+										</div>
+		                <button class="btn btn-sm btn-danger delete-task" data-bs-toggle="modal" data-bs-target="#deleteTaskModal">Delete</button>
+		                <form id="completeTaskForm" method="POST" action="{% url 'mark_task_complete' task.id %}" class="d-inline-block">
+						        	{% csrf_token %}
+						          <button type="submit" class="btn btn-sm btn-success complete-task {% if task.completed %}complete-button{% endif %}">Complete</button>
+										</form>
+										<!-- Delete Task Modal -->
+										<div class="modal fade" id="deleteTaskModal" tabindex="-1" aria-labelledby="deleteTaskModalLabel" aria-hidden="true">
+										  <div class="modal-dialog modal-dialog-centered">
+										    <div class="modal-content">
+										      <div class="modal-header">
+										        <h5 class="modal-title" id="deleteTaskModalLabel">Edit Task</h5>
+										        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+										      </div>
+										      <div class="modal-body">
+										        <h3>Are you sure you want to delete task {{ task.title }} ?</h3>
+										      </div>
+										      <div class="modal-footer justify-content-center">
+										      	<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+										        <form id="deleteTaskForm" method="POST" action="{% url 'delete_task' task.id %}">
+										        	{% csrf_token %}
+										          <button type="submit" class="btn btn-danger">Delete</button>
+										        </form>
+										      </div>
+										    </div>
+										  </div>
+										</div>
+		              </td>
+		            </tr>
+		            {% endfor %}
+	            </tbody>
+	          </table>
+			</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Add Task Modal -->
+<div class="modal fade" id="addTaskModal" tabindex="-1" aria-labelledby="addTaskModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="addTaskModalLabel">Add Task</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <!-- Add Task Form -->
+        <form id="addTaskForm" method="POST" action="{% url 'add_task' %}">
+        	{% csrf_token %}
+        	<input type="hidden" value="weekly" name="recurrent">
+          <div class="mb-3">
+            <label for="title" class="form-label">Title</label>
+            <input type="text" class="form-control" id="title" name="title" required>
+          </div>
+          <div class="mb-3">
+            <label for="description" class="form-label">Description</label>
+            <textarea class="form-control" id="description" name="description" rows="3"></textarea>
+          </div>
+          <div class="mb-3">
+            <label for="execution_day" class="form-label">Execution Day</label>
+            <select class="form-control select-day" id="execution_day" name="execution_day" required>
+            	<option value="">Select Day</option>
+            	<option value="Sunday">Sunday</option>
+            	<option value="Monday">Monday</option>
+            	<option value="Tuesday">Tuesday</option>
+            	<option value="Wednesday">Wednesday</option>
+            	<option value="Thursday">Thursday</option>
+            	<option value="Friday">Friday</option>
+            	<option value="Saturday">Saturday</option>
+            </select>
+          </div>
+          <div class="mb-3">
+            <label for="execution_time">Execution Time</label>
+            <input type="time" class="form-control" name="execution_time" required>
+          </div>
+          <button type="submit" class="btn btn-primary">Add</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  $(document).ready(function() {
+    // DataTable Initialization
+    var dataTable = $('#task-table').DataTable({
+    "columnDefs": [
+      { "width": "17vw", "targets": 2 } // Set width of the third column (index 2) to 100px
+    ]
+  	});
+  });
+</script>
+{% endblock %}
