@@ -23,23 +23,30 @@ Task Master is a web application that allows users to manage their daily and wee
 
 The Task Master project follows a typical Django project structure. Here's an overview of the main directories and files:
 
-- `task/`: The main project directory.
-  - `settings.py`: Configuration file for Django settings, including database setup.
-  - `urls.py`: URL configuration for the project.
-  - `wsgi.py`: Entry point for the project's WSGI application.
-- `taskmaster/`: The main Django app directory.
+- `task/`: The main project directory
+  - `settings.py`: Configuration file for Django settings, including database setup
+  - `urls.py`: URL configuration for the project
+  - `wsgi.py`: Entry point for the project's WSGI application
+- `taskmaster/`: The main Django app directory
   - `migrations/`: Database migration files
   - `static/taskmaster`: Static assetes(CSS, JavaScript, image)
   - `template/taskmater`: Templates for the Task Master app
     - `layout.html`: Base template with common elements
     - `dailytask.html`: Template for displaying daily tasks
-  - `models.py`: Contains the data models for the project, including the `User` model.
-  - `serializers.py`: Serializers for converting models to JSON for the API.
-  - `views.py`: Views for handling HTTP requests and responses.
-- `LICENSE`: This file, .
-- `README.md`: This file, providing information about the project.
-- `manage.py`: Django's command-line utility for managing the project.
-- `requirements.txt`: A file listing the required Python packages for the project.
+    - `weeklytask.html`: Template for displaying weekly tasks
+    - `auth.html`: Template for authentication
+    - `index.html`: Template for home page
+  - `admin.py`: Custom middleware for the Task Master app
+  - `apps.py`: Application configuration for the Task Master app
+  - `middleware.py`: Custom middleware for the Task Master app
+  - `models.py`: Contains the data models for the project
+  - `tests.py`: Unit tests for the Task Master app
+  - `urls.py`: URL configuration for the Task Master app
+  - `views.py`: Views for handling HTTP requests and responses
+- `LICENSE`: License file for the project 
+- `README.md`: This file, providing information about the project
+- `manage.py`: Django's command-line utility for managing the project
+- `requirements.txt`: A file listing the required Python packages for the project
 
 You can customize this structure according to your actual file and directory layout. Provide an explanation of the purpose of each main directory and important files, highlighting any specific files or directories that are relevant to understanding and contributing to the project.
 
