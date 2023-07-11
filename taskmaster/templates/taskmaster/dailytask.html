@@ -8,12 +8,12 @@
       <div class="card">
         <div class="card-header">
           <h2>My Daily Task List 
-        		{% if completed_tasks == total_tasks %}
+        		{% if completed_tasks == total_tasks and total_tasks != 0 %}
           	<span class="badge rounded-pill bg-light complete-all-task">
 	        		({{ completed_tasks }}/{{ total_tasks }})
 	        		<i class="uil uil-check-circle check-icon"></i>
           	</span>
-        		{% else %}
+        		{% elif completed_tasks != total_tasks and total_tasks != 0 %}
           	<span class="badge rounded-pill bg-light not-completed">
 	        		({{ completed_tasks }}/{{ total_tasks }})
 	        		<i class="uil uil-times-circle cross-icon"></i>

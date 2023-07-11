@@ -37,7 +37,7 @@ def index(request):
     total_daily_tasks = Task.objects.filter(daily=True, user=request.user).count()
     completed_weekly_tasks = Task.objects.filter(completed=True, weekly=True, user=request.user).count()
     total_weekly_tasks = Task.objects.filter(weekly=True, user=request.user).count()
-    completed_all_tasks = (completed_daily_tasks+completed_weekly_tasks)%(total_daily_tasks+total_weekly_tasks)
+    completed_all_tasks = (completed_daily_tasks+completed_weekly_tasks) == (total_daily_tasks+total_weekly_tasks) and (total_daily_tasks+total_weekly_tasks) != 0
 
     return render(request, 'taskmaster/index.html', 
             {
@@ -212,7 +212,6 @@ def set_timezone(request):
 
         # Extract the timeZone value from the JSON data
         time_zone = data.get('timeZone')
-        print(time_zone)
         # Get the user's profile or create it if it doesn't exist
         profile, created = UserProfile.objects.get_or_create(user=request.user)
         if created:

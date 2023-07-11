@@ -6,17 +6,21 @@
   <div class="row justify-content-center mt-5">
     <div class="col-md-6 text-center">
       <h2>Welcome, {{ user.username }}</h2>
-      {% if completed_daily_tasks == total_daily_tasks %}
+      {% if completed_daily_tasks == total_daily_tasks and  total_daily_tasks != 0 %}
       <h5 class="text-success">You Have Completed All Daily Task</h5>
-      {% else  %}
+      {% elif completed_daily_tasks != total_daily_tasks and  total_daily_tasks != 0  %}
       <h5> You have {{ completed_daily_tasks }}/{{ total_daily_tasks }} daily tasks to complete</h5>
+      {% else %}
+      <h5>Add New Daily Task</h5>
       {% endif %}
-      {% if completed_weekly_tasks == total_weekly_tasks %}
+      {% if completed_weekly_tasks == total_weekly_tasks and total_weekly_tasks != 0 %}
       <h5 class="text-success">You Have Completed All Weekly Task</h5>
-      {% else  %}
+      {% elif completed_weekly_tasks != total_weekly_tasks and total_weekly_tasks != 0 %}
       <h5> You have {{ completed_weekly_tasks }}/{{ total_weekly_tasks }} weekly tasks to complete</h5>
+      {% else %}
+      <h5>Add New Weekly Task</h5>
       {% endif %}
-      {% if completed_all_tasks == 0 %}
+      {% if completed_all_tasks %}
       <h1 class="text-success">Good Job <i class="uil uil-thumbs-up"></i></h1>
       {% endif %}
       <div class="mt-5">
