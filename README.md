@@ -2,6 +2,9 @@
 
 Task Master is a web application that allows users to manage their daily and weekly tasks. Users can register an account, log in, create, view, update, and delete their tasks. The application provides a user-friendly interface with features like task completion tracking.
 
+#### Video Demo:[Demo](https://youtu.be/TTgARJFSDxc)
+#### Website: [TaskMaster](https://alif.pythonanywhere.com)
+
 ## Features
 
 - User authentication: Register an account and log in to access the task management features.
