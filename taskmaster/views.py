@@ -95,8 +95,7 @@ def register_view(request):
             user = User.objects.get(username=username)
             userprofile = UserProfile.objects.create(user=user)
             userprofile.save()
-            login_form = UserLoginForm(data=request.POST)
-            checked = False
+            return redirect('login')
         elif register_form.has_error('password2'):
             register_form.fields['password1'].widget.attrs['class'] = 'is-invalid'
 
