@@ -9,7 +9,7 @@
                     <input class="checkbox" type="checkbox" id="reg-log" name="reg-log" {% if checked %}checked{% endif %} />
                     <label for="reg-log"></label>
                     <div class="card-3d-wrap mx-auto">
-                        <div class="card-3d-wrapper">
+                        <div class="card-3d-wrapper mx-auto">
                             <div class="card-front">
                                 <div class="center-wrap">
                                     <div class="section text-center">
@@ -52,22 +52,22 @@
                                         <h4 class="mb-4 pb-3">Sign Up</h4>
                                         <form id="register-form" method="POST" action="{% url 'register' %}">
                                             {% csrf_token %}
-                                            <div class="form-group">
+                                            <div class="form-group position-relative">
                                                 <input type="text" name="{{ register_form.fullname.html_name }}" class="form-style {{ register_form.fullname.field.widget.attrs.class }} {% if register_form.fullname.errors %} is-invalid{% endif %}" placeholder="Your Full Name" id="{{ register_form.fullname.id_for_label }}" autocomplete="nope" {% if register_form.fullname.field.required %}required{% endif %} value="{% if register_form.fullname.value %}{{ register_form.fullname.value }}{% endif %}">
                                                 <i class="input-icon uil uil-user"></i>
                                                 {% if register_form.fullname.errors %}
-                                                <div class="invalid-feedback">
+                                                <div class="invalid-feedback position-absolute pe-3 top-0 start-100 text-start show">
                                                     {% for error in register_form.fullname.errors %}
                                                     <p class="mb-0">{{ error }}</p>
                                                     {% endfor %}
                                                 </div>
                                                 {% endif %}
                                             </div>
-                                            <div class="form-group mt-2">
+                                            <div class="form-group mt-2 position-relative">
                                                 <input type="text" name="{{ register_form.username.html_name }}" class="form-style {{ register_form.username.field.widget.attrs.class }} {% if register_form.username.errors %} is-invalid{% endif %}" placeholder="Your username" id="{{ register_form.username.id_for_label }}2" autocomplete="nope" {% if register_form.username.field.required %}required{% endif %} value="{% if register_form.username.value %}{{ register_form.username.value }}{% endif %}">
                                                 <i class="input-icon uil uil-at"></i>
                                                 {% if register_form.username.errors %}
-                                                <div class="invalid-feedback">
+                                                <div class="invalid-feedback position-absolute pe-3 top-0 start-100 text-start show">
                                                     {% for error in register_form.username.errors %}
                                                     <p class="mb-0">{{ error }}</p>
                                                     {% endfor %}
@@ -75,29 +75,29 @@
                                                 {% endif %}
                                             </div>
                                             <div class="form-group mt-2">
-                                                <div class="input-group">
+                                                <div class="input-group position-relative">
                                                     <input type="password" name="{{ register_form.password1.html_name }}" class="form-style {{ register_form.password1.field.widget.attrs.class }} {% if register_form.password1.errors %} is-invalid{% endif %}" placeholder="Your Password" id="{{ register_form.password1.id_for_label }}" autocomplete="new-password" {% if register_form.password1.field.required %}required{% endif %}>
                                                     <i class="input-icon uil uil-lock-alt"></i>
                                                     <i class="uil uil-eye-slash password-icon password-toggle" type="button" id="{{ register_form.password1.id_for_label }}" data-target="{{ register_form.password1.id_for_label }}"></i>
-                                                    {% if register_form.password1.errors %}
-                                                    <div class="invalid-feedback">
-                                                        {% for error in register_form.password1.errors %}
-                                                        <p class="mb-0">{{ error }}</p>
+                                                    {% if register_form.password2.errors and 'The two password fields didn’t match.' not in register_form.password2.errors %}
+                                                    <div class="invalid-feedback password position-absolute top-0 pe-3 start-100 text-start show">
+                                                        {% for error in register_form.password2.errors %}
+                                                            {% if error != 'The two password fields didn’t match.' %}
+                                                                <p class="mb-0">{{ error }}</p>
+                                                            {% endif %}
                                                         {% endfor %}
                                                     </div>
                                                     {% endif %}
                                                 </div>
                                             </div>
                                             <div class="form-group mt-2">
-                                                <div class="input-group">
+                                                <div class="input-group position-relative">
                                                     <input type="password" name="{{ register_form.password2.html_name }}" class="form-style {{ register_form.password2.field.widget.attrs.class }} {% if register_form.password2.errors %} is-invalid{% endif %}" placeholder="Your Password" id="{{ register_form.password2.id_for_label }}" autocomplete="new-password" {% if register_form.password2.field.required %}required{% endif %}>
                                                     <i class="input-icon uil uil-lock-alt"></i>
                                                     <i class="uil uil-eye-slash password-icon password-toggle" type="button" id="{{ register_form.password2.id_for_label }}" data-target="{{ register_form.password2.id_for_label }}"></i>
-                                                    {% if register_form.password2.errors %}
-                                                    <div class="invalid-feedback password">
-                                                        {% for error in register_form.password2.errors %}
-                                                        <p class="mb-0">{{ error }}</p>
-                                                        {% endfor %}
+                                                    {% if register_form.password2.errors and 'The two password fields didn’t match.'  in register_form.password2.errors %}
+                                                    <div class="invalid-feedback password position-absolute top-0 pe-3 start-100 text-start show">
+                                                        <p class="mb-0">The two password fields didn’t match.</p>
                                                     </div>
                                                     {% endif %}
                                                 </div>
@@ -114,4 +114,16 @@
         </div>
     </div>
 </div>
+  <script>
+    {% if messages %}
+      {% for message in messages %}
+        {% if message.tags == 'success' %}
+          showAlert("{{ message }}");
+        {% elif message.tags == 'error' %}
+          showToast("{{ message }}", "error");
+        {% endif %}
+      {% endfor %}
+    {% endif %}
+  </script>
+
 {% endblock %}

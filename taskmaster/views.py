@@ -2,6 +2,7 @@ from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
+from django.contrib import messages
 from django import forms
 from django.http import JsonResponse
 import json
@@ -70,8 +71,10 @@ def login_view(request):
         if login_form.is_valid():
             user = login_form.get_user()
             login(request, user)
+            messages.success(request, f'Logged in successfully.')
             return redirect('index')
         elif not login_form.has_error('username') and not login_form.has_error('password'):
+            messages.error(request, f'Invalid username or password.')
             return render(request, 'taskmaster/auth.html', {'login_form': login_form, 'register_form': register_form})
         else:    
             return render(request, 'taskmaster/auth.html', {'login_form': login_form, 'register_form': register_form})
@@ -95,9 +98,12 @@ def register_view(request):
             user = User.objects.get(username=username)
             userprofile = UserProfile.objects.create(user=user)
             userprofile.save()
+            messages.success(request, f'Account created for {username}. You can now log in.')
             return redirect('login')
         elif register_form.has_error('password2'):
             register_form.fields['password1'].widget.attrs['class'] = 'is-invalid'
+        else:
+            messages.error(request, f'An error occurred. Please try again later.')
 
     else:
         login_form = UserLoginForm()
@@ -109,6 +115,7 @@ def register_view(request):
 
 def logout_view(request):
     logout(request)
+    messages.success(request, f'Logged out successfully.')
     return redirect('auth')
 
 
@@ -225,3 +232,13 @@ def set_timezone(request):
         # Set the time zone for the current request
         timezone.activate(time_zone)
         return JsonResponse({'success': True})
+
+
+def check_username_availability(request):
+    if request.method == 'POST':
+        username = request.POST.get('username')
+        print(username)
+        response_data = {'is_available': not User.objects.filter(username=username).exists()}
+        print(response_data)
+        return JsonResponse(response_data)
+    return JsonResponse({'is_available': False})

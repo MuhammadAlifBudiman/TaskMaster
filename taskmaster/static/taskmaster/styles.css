@@ -87,7 +87,6 @@ h6 span{
 
 .card-3d-wrap {
   position: relative;
-  width: 440px;
   max-width: 100%;
   height: 400px;
   -webkit-transform-style: preserve-3d;
@@ -96,11 +95,13 @@ h6 span{
   margin-top: 60px;
 }
 .card-3d-wrapper {
-  width: 100%;
+  width: 440px;
+  max-width: 100%;
   height: 100%;
   position:absolute;    
   top: 0;
-  left: 0;  
+  left: 0; 
+  right: 0; 
   -webkit-transform-style: preserve-3d;
   transform-style: preserve-3d;
   transition: all 600ms ease-out; 
@@ -386,5 +387,53 @@ span.badge.bg-light.not-completed {
   }
   100% {
     color: #c4c3ca;
+  }
+}
+
+.invalid-feedback {
+  background-color: yellow;
+  color: black;
+  border: 1px solid black;
+  padding: 8px;
+  border-radius: 0 8px 8px;
+  position: relative;
+  margin-top: 10px;
+  opacity: 0;
+  transition: opacity 0.3s ease-in-out;
+}
+
+.invalid-feedback.show {
+  opacity: 1;
+}
+
+.invalid-feedback::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -8px;
+  width: 0;
+  height: 0;
+  border-top: 8px solid transparent;
+  border-bottom: 8px solid transparent;
+  border-right: 8px solid yellow;
+}
+
+@media screen and (max-width: 767px) {
+  .invalid-feedback.position-absolute {
+    position: relative!important;
+    left: 0!important;
+  }
+
+  .invalid-feedback::before {
+    content: "";
+    position: absolute;
+    top: -8px;
+    left: 0;
+    width: 0;
+    height: 0;
+    border-top: 0px solid transparent;
+    border-right: 8px solid transparent;
+    border-left: 8px solid transparent;
+    border-bottom: 8px solid yellow;
   }
 }

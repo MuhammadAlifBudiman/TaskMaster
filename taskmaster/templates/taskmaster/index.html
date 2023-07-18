@@ -52,7 +52,6 @@
 
 <script>
   var userTimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-
   fetch('set-timezone/', {
     method: 'POST',
     headers: {
@@ -73,5 +72,15 @@
       // Handle any errors that occur during the request
       console.error('Request error:', error);
     });
+
+  {% if messages %}
+    {% for message in messages %}
+      {% if message.tags == 'success' %}
+        showAlert("{{ message }}");
+      {% elif message.tags == 'error' %}
+        showToast("{{ message }}", "error");
+      {% endif %}
+    {% endfor %}
+  {% endif %}
 </script>
 {% endblock %}

@@ -14,4 +14,5 @@ urlpatterns = [
     path('delete/<int:task_id>/', views.delete_task, name='delete_task'),
     path('mark-complete/<int:task_id>/', views.mark_task_complete, name='mark_task_complete'),
     path('set-timezone/', views.set_timezone, name='set_timezone'),
+    path('check_username_availability/', views.check_username_availability, name='check_username_availability'),
 ]
