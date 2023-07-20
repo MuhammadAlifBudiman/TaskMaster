@@ -20,7 +20,7 @@
                                                 <input type="text" name="{{ login_form.username.html_name }}" class="form-style {{ login_form.username.field.widget.attrs.class }} {% if login_form.username.errors %} is-invalid{% endif %}" placeholder="Your Username" id="{{ login_form.username.id_for_label }}" {% if login_form.username.field.required %}required{% endif %} autocomplete="nope" >
                                                 <i class="input-icon uil uil-at"></i>
                                                 {% if login_form.username.errors %}
-                                                <div class="invalid-feedback">
+                                                <div class="invalid-feedback position-absolute pe-3 top-0 start-100 text-start show">
                                                     {% for error in login_form.username.errors %}
                                                     <p class="mb-0">{{ error }}</p>
                                                     {% endfor %}
@@ -34,7 +34,7 @@
                                                     <i class="uil uil-eye-slash password-icon password-toggle" type="button" id="togglePassword" data-target="{{ login_form.password.id_for_label }}"></i>
                                                 </div>
                                                 {% if login_form.password.errors %}
-                                                <div class="invalid-feedback">
+                                                <div class="invalid-feedback position-absolute pe-3 top-0 start-100 text-start show">
                                                     {% for error in login_form.password.errors %}
                                                     <p class="mb-0">{{ error }}</p>
                                                     {% endfor %}

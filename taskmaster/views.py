@@ -237,8 +237,6 @@ def set_timezone(request):
 def check_username_availability(request):
     if request.method == 'POST':
         username = request.POST.get('username')
-        print(username)
         response_data = {'is_available': not User.objects.filter(username=username).exists()}
-        print(response_data)
         return JsonResponse(response_data)
     return JsonResponse({'is_available': False})
