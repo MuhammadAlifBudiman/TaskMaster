@@ -1,12 +1,13 @@
 {% extends 'taskmaster/layout.html' %}
 
 {% block content %}
+
 <div class="container container-task">
   <div class="row justify-content-center mt-5">
     <div class="col-md-12">
       <div class="card">
         <div class="card-header">
-          <h2>My Daily Task List 
+          <h2>My Monthly Task List 
         		{% if completed_tasks == total_tasks and total_tasks != 0 %}
           	<span class="badge rounded-pill bg-light complete-all-task">
 	        		({{ completed_tasks }}/{{ total_tasks }})
@@ -22,7 +23,7 @@
         </div>
         <div class="card-body">
         	<a type="button" href="{% url 'index' %}" class="btn btn-primary mb-2">Home</a>
-			<button type="button" class="btn btn-primary mb-2" data-bs-toggle="modal" data-bs-target="#addTaskModal">Add Daily Task</button>
+			<button type="button" class="btn btn-primary mb-2" data-bs-toggle="modal" data-bs-target="#addTaskModal">Add Monthly Task</button>
 			<div class="table-responsive">
 	          <table id="task-table" class="table">
 	            <thead>
@@ -38,7 +39,7 @@
 	            <tbody>
 	              <!-- Task items will be dynamically populated here -->
 		            {% for task in tasks %}
-		            <tr id="row_{{task.id}}" data-id="{{ task.id }}" class="{% if task.completed %}completed{% endif %}">
+		            <tr data-id="{{ task.id }}" class="{% if task.completed %}completed{% endif %}">
 		              <td>{{ forloop.counter }}</td>
 		              <td>{{ task.title }}</td>
 								  <td>
@@ -54,12 +55,12 @@
 								    </div>
 								  </td>
 		              <td>{{ task.created_at|date:'F d, Y' }}</td>
-		              <td>{{ task.execution_time }}</td>
+		              <td>Day {{ task.execution_date }}, {{ task.execution_time }}</td>
 		              <td>
 		                <button class="btn btn-sm btn-primary edit-task" data-bs-toggle="modal" data-bs-target="#editTaskModal_{{task.id}}">Edit</button>
 										<!-- Edit Task Modal -->
 										<div class="modal fade" id="editTaskModal_{{task.id}}" tabindex="-1" aria-labelledby="editTaskModalLabel_{{task.id}}" aria-hidden="true">
-										  <div class="modal-dialog modal-dialog-centered" >
+										  <div class="modal-dialog modal-dialog-centered">
 										    <div class="modal-content">
 										      <div class="modal-header">
 										        <h5 class="modal-title" id="editTaskModalLabel_{{task.id}}">Edit Task</h5>
@@ -69,7 +70,7 @@
 										        <!-- Edit Task Form -->
 										        <form id="editTaskForm_{{task.id}}" method="POST" action="{% url 'edit_task' task.id %}" data-task-id="{{task.id}}" data-user-id="{{request.user.id}}" class="editTaskForm">
 										        	{% csrf_token %}
-										        	<input type="hidden" value=True name="daily">
+										        	<input type="hidden" value=True name="monthly">
 										          <div class="mb-3">
 										            <label for="{{ form.title.id_for_label }}_edit_{{task.id}}" class="form-label">Title</label>
 										            <input type="text" class="form-control {% if form.title.errors %} is-invalid{% endif %}" id="{{ form.title.id_for_label }}_edit_{{task.id}}" name="{{ form.title.html_name }}" value="{{ task.title }}" {% if form.title.field.required %}required{% endif %} autocomplete="off">
@@ -93,6 +94,14 @@
 															  {% endif %}
 										          </div>
 										          <div class="mb-3">
+										            <label for="{{ form.execution_date.id_for_label }}_edit_{{task.id}}" class="form-label">Execution Date</label>
+										            <select class="form-control select-day select2{% if form.execution_date.errors %} is-invalid{% endif %}" id="{{ form.execution_date.id_for_label }}_edit_{{task.id}}" name="{{ form.execution_date.html_name }}" {% if form.execution_date.field.required %}required{% endif %}>
+								                  {% for value, label in form.execution_date.field.widget.choices %}
+								                  <option value="{{ value }}" {% if value == task.execution_date %}selected{% endif %}>{{ label }}</option>
+								                  {% endfor %}
+										            </select>
+										          </div>
+										          <div class="mb-3">
 										            <label for="{{ form.execution_time.id_for_label }}_edit_{{task.id}}" class="form-label">Execution Time</label>
 										            <input type="time" class="form-control {% if form.execution_time.errors %} is-invalid{% endif %}" id="{{ form.execution_time.id_for_label }}_edit_{{task.id}}" name="{{ form.execution_time.html_name }}" value="{{ task.execution_time|time:'H:i' }}" required>
 															  {% if form.execution_time.errors %}
@@ -112,7 +121,7 @@
 		                <button class="btn btn-sm btn-danger delete-task" data-bs-toggle="modal" data-bs-target="#deleteTaskModal_{{task.id}}">Delete</button>
 		                <form id="completeTaskForm_{{task.id}}" method="POST" action="{% url 'mark_task_complete' task.id %}" data-task-id="{{task.id}}" data-user-id="{{request.user.id}}" data-task-completed="{{task.completed}}" class="d-inline-block completeTaskForm">
 						        	{% csrf_token %}
-						          <button type="submit" class="btn btn-sm btn-success complete-task {% if task.completed %}complete-button{% endif %}" >Complete</button>
+						          <button type="submit" class="btn btn-sm btn-success complete-task {% if task.completed %}complete-button{% endif %}">Complete</button>
 										</form>
 										<!-- Delete Task Modal -->
 										<div class="modal fade" id="deleteTaskModal_{{task.id}}" tabindex="-1" aria-labelledby="deleteTaskModalLabel_{{task.id}}" aria-hidden="true">
@@ -148,7 +157,7 @@
 </div>
 
 <!-- Add Task Modal -->
-<div class="modal fade " id="addTaskModal" tabindex="-1" aria-labelledby="addTaskModalLabel" aria-hidden="true">
+<div class="modal fade" id="addTaskModal" tabindex="-1" aria-labelledby="addTaskModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content">
       <div class="modal-header">
@@ -159,7 +168,7 @@
         <!-- Add Task Form -->
         <form id="addTaskForm" method="POST" action="{% url 'add_task' %}" data-user-id="{{request.user.id}}">
         	{% csrf_token %}
-        	<input type="hidden" value=True name="daily">
+        	<input type="hidden" value=True name="monthly">
           <div class="mb-3">
             <label for="{{ form.title.id_for_label }}" class="form-label">Title</label>
             <input type="text" class="form-control {% if form.title.errors %} is-invalid{% endif %}" id="{{ form.title.id_for_label }}" name="{{ form.title.html_name }}" {% if form.title.field.required %}required{% endif %} autocomplete="off">
@@ -181,6 +190,14 @@
 					      {% endfor %}
 					    </div>
 					  {% endif %}
+          </div>
+          <div class="mb-3">
+            <label for="{{ form.execution_date.id_for_label }}" class="form-label">Execution Date</label>
+            <select class="form-control select-day select2{% if form.execution_date.errors %} is-invalid{% endif %}" id="{{ form.execution_date.id_for_label }}" name="{{ form.execution_date.html_name }}" required>
+              {% for value, label in form.execution_date.field.widget.choices %}
+              <option value="{{ value }}">{{ label }}</option>
+              {% endfor %}
+            </select>
           </div>
           <div class="mb-3">
             <label for="{{ form.execution_time.id_for_label }}" class="form-label">Execution Time</label>
@@ -209,208 +226,53 @@
     ]
   	});
 
+    function initializeSelect2(modalId) {
+      var select = $('#' + modalId + ' .select2');
+      if (select.length > 0) {
+        select.select2({
+          dropdownParent: $('#' + modalId), // Set the dropdownParent to the modal element
+          width: '100%' // Set the initial width to 100%
+        });
 
-  	$('#addTaskForm').on('submit', function(event) {
-	    event.preventDefault();
-	    const formData = $(this).serializeArray();
-	    const newData = {};
-	    const userID = $(this).data('user-id')
-	    formData.forEach((field) => {
-	      newData[field.name] = field.value;
-	    });
+        select.on('select2:select', function (e) {
+          var value = e.target.value;
+          if (value !== '') {
+            $('option[value=""]').prop('disabled', true);
+          }
+        });
 
-	    newData.user = userID;
-	    $.ajax({
-	      type: "POST",
-	      url: `/api/tasks/`,
-	      data: JSON.stringify(newData),
-	      contentType: "application/json",
-	      success: function (data, status, xhr) {
-	        // Handle success response
-	        showToast(`Task <b>${data.title}</b> has been added successfully.`, "success", 3000);
-	        setTimeout(function () {
-	          location.reload();
-	        }, 2000);
-	      },
-	      error: function (xhr, status, error) {
-	        if(xhr.status == 400){
-	        	showToast('Please fill all the field.', "error", 3000);
-			      const errors = xhr.responseJSON;
-			      for (const fieldName in errors) {
-			        const fieldError = errors[fieldName][0];
-			        const fieldInput = $(`#addTaskForm #id_${fieldName}`);
-			        let fieldFeedback = fieldInput.siblings('.invalid-feedback');
-			        if (fieldFeedback.length === 0) {
-			          // Create the invalid-feedback element if it doesn't exist
-			          fieldFeedback = $('<div class="invalid-feedback"></div>');
-			          fieldInput.after(fieldFeedback);
-			        }
-			        fieldInput.addClass('is-invalid');
-			        fieldFeedback.text(fieldError);
-			      }
-	        }
-	        else if(xhr.status == 401){
-	        	showToast('You are not authenticated. Please login first.', "error", 3000);
-	        }
-	        else if(xhr.status == 403){
-	        	showToast('You are unauthorized to edit this task.', "error", 3000);
-	        }
-	        else if(xhr.status == 404){
-	        	showToast('Task is not found.', "error", 3000);
-	        }
-	        else{
-	        	showToast('An error occurred. Please try again later.', "error", 3000);
-	        }
-	      },
-	    });
-	  });
+        // Calculate and set the maximum width for the select options
+        var maxWidth = 0;
+        select.find('option').each(function () {
+          var optionWidth = $(this).text().length;
+          if (optionWidth > maxWidth) {
+            maxWidth = optionWidth;
+          }
+        });
 
-	  $('.editTaskForm').on('submit', function(event) {
-	    event.preventDefault();
-	    const taskId = $(this).data("task-id");
-	    const formData = $(this).serializeArray();
-	    const newData = {};
-	    const userID = $(this).data('user-id')
-	    formData.forEach((field) => {
-	      newData[field.name] = field.value;
-	    });
+        // Set the width of the dropdown to the calculated maximum width
+        select.select2('destroy'); // Destroy the initial Select2 instance
+        select.select2({
+          dropdownParent: $('#' + modalId), // Set the dropdownParent to the modal element
+          width: (maxWidth * 12) + 'px' // Set the width based on the maximum width of options
+        });
 
-	    newData.user = userID;
-	    $.ajax({
-	      type: "PUT",
-	      url: `/api/tasks/${taskId}/`,
-	      data: JSON.stringify(newData),
-	      contentType: "application/json",
-	      success: function (data, status, xhr) {
-	        // Handle success response
-	        showToast(`Task <b>${data.title}</b> has been edited successfully.`, "success", 3000);
-	        setTimeout(function () {
-	          location.reload();
-	        }, 2000);
-	      },
-	      error: function (xhr, status, error) {
-	        if(xhr.status == 400){
-	        	showToast('Please fill all the field.', "error", 3000);
-			      const errors = xhr.responseJSON;
-			      for (const fieldName in errors) {
-			        const fieldError = errors[fieldName][0];
-			        const fieldInput = $(`#editTaskForm_${taskId} #id_${fieldName}_edit_${taskId}`);
-			        let fieldFeedback = fieldInput.siblings('.invalid-feedback');
-			        if (fieldFeedback.length === 0) {
-			          // Create the invalid-feedback element if it doesn't exist
-			          fieldFeedback = $('<div class="invalid-feedback"></div>');
-			          fieldInput.after(fieldFeedback);
-			        }
-			        fieldInput.addClass('is-invalid');
-			        fieldFeedback.text(fieldError);
-			      }
-	        }
-	        else if(xhr.status == 401){
-	        	showToast('You are not authenticated. Please login first.', "error", 3000);
-	        }
-	        else if(xhr.status == 403){
-	        	showToast('You are unauthorized to edit this task.', "error", 3000);
-	        }
-	        else if(xhr.status == 404){
-	        	showToast('Task is not found.', "error", 3000);
-	        }
-	        else{
-	        	showToast('An error occurred. Please try again later.', "error", 3000);
-	        }
-	      },
-	    });
-	  });
+        select.on('select2:select', function (e) {
+          var value = e.target.value;
+          if (value !== '') {
+            $('option[value=""]').prop('disabled', true);
+          }
+        });
+      }
+    }
 
-	  $('.completeTaskForm').on('submit', function(e){
-	  	e.preventDefault();
-	    const taskId = $(this).data("task-id");
-	    const taskCompleted = $(this).data("task-completed")
-	    const formData = $(`#editTaskForm_${taskId}`).serializeArray();
-	    const newData = {};
-	    const userID = $(this).data('user-id')
-	    formData.forEach((field) => {
-	      newData[field.name] = field.value;
-	    });
+    // Initialize Select2 for addTaskModal
+    initializeSelect2('addTaskModal');
 
-	    newData.user = userID;
-	    // Toggle the completed field between true and false
-  		newData.completed = taskCompleted === "True" ? false : true;
-	    $.ajax({
-	      type: "PUT",
-	      url: `/api/tasks/${taskId}/`,
-	      data: JSON.stringify(newData),
-	      contentType: "application/json",
-	      success: function (data) {
-	        // Handle success response
-	        if(data.completed){
-	        	showToast(`Task <b>${data.title}</b> has been completed.`, "success", 3000);
-		        setTimeout(function () {
-		          location.reload();
-		        }, 2000);
-	        }
-	        else{
-		        location.reload();
-	        }
-	      },
-	      error: function (xhr, status, error) {
-	        if(xhr.status == 400){
-	        	showToast('Something went wrong.', "error", 3000);
-	        }
-	        else if(xhr.status == 401){
-	        	showToast('You are not authenticated. Please login first.', "error", 3000);
-	        }
-	        else if(xhr.status == 403){
-	        	showToast('You are unauthorized to complete this task.', "error", 3000);
-	        }
-	        else if(xhr.status == 404){
-	        	showToast('Task is not found.', "error", 3000);
-	        }
-	        else{
-	        	showToast('An error occurred. Please try again later.', "error", 3000);
-	        }
-	      },
-	    });
-	  });
-
-	  $('.deleteTaskForm').on('submit', function(e){
-	  	e.preventDefault();
-	    const taskId = $(this).data("task-id");
-	    const taskTitle = $(this).data("task-title");
-	    // Close the modal before deleting the task
-  		$(`#deleteTaskModal_${taskId}`).modal('hide');
-	    $.ajax({
-	      type: "DELETE",
-	      url: `/api/tasks/${taskId}/`,
-	      data: {},
-	      contentType: "application/json",
-	      success: function (data) {
-	        // Handle success response
-		      showToast(`Task <b>${taskTitle}</b> has been deleted.`, "success", 3000);
-		      // Optionally, update the task list on the frontend
-		      // For example, remove the deleted task from the list
-		      console.log($(`#row_${taskId}`))
-		      $(`#row_${taskId}`).remove();
-	      },
-	      error: function (xhr, status, error) {
-	        if(xhr.status == 400){
-	        	showToast('Something went wrong.', "error", 3000);
-	        }
-	        else if(xhr.status == 401){
-	        	showToast('You are not authenticated. Please login first.', "error", 3000);
-	        }
-	        else if(xhr.status == 403){
-	        	showToast('You are unauthorized to delete this task.', "error", 3000);
-	        }
-	        else if(xhr.status == 404){
-	        	showToast('Task is not found.', "error", 3000);
-	        }
-	        else{
-	        	showToast('An error occurred. Please try again later.', "error", 3000);
-	        }
-	      },
-	    });
-	  });
-
+    // Initialize Select2 for each editTaskModal (if there are multiple)
+    {% for task in tasks %}
+    initializeSelect2('editTaskModal_{{ task.id }}');
+    {% endfor %}
 
   });
 </script>

@@ -9,13 +9,13 @@ function showAlert(info) {
 }
 
 // Display a toast notification
-function showToast(title, icon) {
+function showToast(title, icon, timer) {
   const Toast = Swal.mixin({
     toast: true,
     position: 'top-end',
     showConfirmButton: false,
-    timer: 3000,
-    timerProgressBar: true
+    timer: timer,
+    timerProgressBar: true,
   });
 
   Toast.fire({

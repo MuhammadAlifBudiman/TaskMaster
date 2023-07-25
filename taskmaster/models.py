@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User
 from django.utils import timezone
+from django.core.validators import MinValueValidator, MaxValueValidator
 
 # Create your models here.
 
@@ -12,8 +13,10 @@ class Task(models.Model):
     created_at = models.DateTimeField(default=timezone.now)
     daily = models.BooleanField(default=False)
     weekly = models.BooleanField(default=False)
-    execution_day = models.CharField(max_length=9, blank=True)
+    monthly = models.BooleanField(default=False)
+    execution_day = models.CharField(max_length=9, blank=True, null=True)
     execution_time = models.TimeField(null=True, blank=True)
+    execution_date = models.PositiveIntegerField(null=True, blank=True, validators=[MinValueValidator(1), MaxValueValidator(31)])
 
     def __str__(self):
         return self.title

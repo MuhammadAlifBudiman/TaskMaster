@@ -57,43 +57,60 @@
 		              <td>{{ task.created_at|date:'F d, Y' }}</td>
 		              <td>{{ task.execution_day }}, {{ task.execution_time }}</td>
 		              <td>
-		                <button class="btn btn-sm btn-primary edit-task" data-bs-toggle="modal" data-bs-target="#editTaskModal">Edit</button>
+		                <button class="btn btn-sm btn-primary edit-task" data-bs-toggle="modal" data-bs-target="#editTaskModal_{{task.id}}">Edit</button>
 										<!-- Edit Task Modal -->
-										<div class="modal fade" id="editTaskModal" tabindex="-1" aria-labelledby="editTaskModalLabel" aria-hidden="true">
+										<div class="modal fade" id="editTaskModal_{{task.id}}" tabindex="-1" aria-labelledby="editTaskModalLabel_{{task.id}}" aria-hidden="true">
 										  <div class="modal-dialog modal-dialog-centered">
 										    <div class="modal-content">
 										      <div class="modal-header">
-										        <h5 class="modal-title" id="editTaskModalLabel">Edit Task</h5>
+										        <h5 class="modal-title" id="editTaskModalLabel_{{task.id}}">Edit Task</h5>
 										        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
 										      </div>
 										      <div class="modal-body">
-										        <!-- Add Task Form -->
-										        <form id="addTaskForm" method="POST" action="{% url 'edit_task' task.id %}">
+										        <!-- Edit Task Form -->
+										        <form id="editTaskForm_{{task.id}}" method="POST" action="{% url 'edit_task' task.id %}" data-task-id="{{task.id}}" data-user-id="{{request.user.id}}" class="editTaskForm">
 										        	{% csrf_token %}
+										        	<input type="hidden" value=True name="weekly">
 										          <div class="mb-3">
-										            <label for="title" class="form-label">Title</label>
-										            <input type="text" class="form-control" id="title" name="title" value="{{ task.title }}" required>
+										            <label for="{{ form.title.id_for_label }}_edit_{{task.id}}" class="form-label">Title</label>
+										            <input type="text" class="form-control {% if form.title.errors %} is-invalid{% endif %}" id="{{ form.title.id_for_label }}_edit_{{task.id}}" name="{{ form.title.html_name }}" value="{{ task.title }}" {% if form.title.field.required %}required{% endif %} autocomplete="off">
+															  {% if form.title.errors %}
+															    <div class="invalid-feedback">
+															      {% for error in form.title.errors %}
+															        {{ error }}
+															      {% endfor %}
+															    </div>
+															  {% endif %}
 										          </div>
 										          <div class="mb-3">
-										            <label for="description" class="form-label">Description</label>
-										            <textarea class="form-control" id="description" name="description" rows="3">{% if task.description %}{{ task.description }}{% endif %}</textarea>
+										            <label for="{{ form.description.id_for_label }}_edit_{{task.id}}" class="form-label">Description</label>
+										            <textarea class="form-control {% if form.description.errors %} is-invalid{% endif %}" id="{{ form.description.id_for_label }}_edit_{{task.id}}" name="{{ form.description.html_name }}" rows="3" {% if form.description.field.required %}required{% endif %}>{{ task.description }}</textarea>
+															  {% if form.description.errors %}
+															    <div class="invalid-feedback">
+															      {% for error in form.description.errors %}
+															        {{ error }}
+															      {% endfor %}
+															    </div>
+															  {% endif %}
 										          </div>
 										          <div class="mb-3">
-										            <label for="execution_day" class="form-label">Execution Day</label>
-										            <select class="form-control select-day" id="execution_day" name="execution_day" required>
-										            	<option value="" disabled>Select Day</option>
-										            	<option value="Sunday" {% if task.execution_day == 'Sunday' %}selected{% endif %}>Sunday</option>
-										            	<option value="Monday" {% if task.execution_day == 'Monday' %}selected{% endif %}>Monday</option>
-										            	<option value="Tuesday" {% if task.execution_day == 'Tuesday' %}selected{% endif %}>Tuesday</option>
-										            	<option value="Wednesday" {% if task.execution_day == 'Wednesday' %}selected{% endif %}>Wednesday</option>
-										            	<option value="Thursday" {% if task.execution_day == 'Thursday' %}selected{% endif %}>Thursday</option>
-										            	<option value="Friday" {% if task.execution_day == 'Friday' %}selected{% endif %}>Friday</option>
-										            	<option value="Saturday" {% if task.execution_day == 'Saturday' %}selected{% endif %}>Saturday</option>
+										            <label for="{{ form.execution_day.id_for_label }}_edit_{{task.id}}" class="form-label">Execution Day</label>
+										            <select class="form-control select-day select2{% if form.execution_day.errors %} is-invalid{% endif %}" id="{{ form.execution_day.id_for_label }}_edit_{{task.id}}" name="{{ form.execution_day.html_name }}" {% if form.execution_day.field.required %}required{% endif %}>
+								                  {% for value, label in form.execution_day.field.widget.choices %}
+								                  <option value="{{ value }}" {% if value == task.execution_day %}selected{% endif %}>{{ label }}</option>
+								                  {% endfor %}
 										            </select>
 										          </div>
 										          <div class="mb-3">
-										            <label for="execution_time">Execution Time</label>
-										            <input type="time" class="form-control" name="execution_time" value="{{ task.execution_time|time:'H:i' }}" required>
+										            <label for="{{ form.execution_time.id_for_label }}_edit_{{task.id}}" class="form-label">Execution Time</label>
+										            <input type="time" class="form-control {% if form.execution_time.errors %} is-invalid{% endif %}" id="{{ form.execution_time.id_for_label }}_edit_{{task.id}}" name="{{ form.execution_time.html_name }}" value="{{ task.execution_time|time:'H:i' }}" required>
+															  {% if form.execution_time.errors %}
+															    <div class="invalid-feedback">
+															      {% for error in form.execution_time.errors %}
+															        {{ error }}
+															      {% endfor %}
+															    </div>
+															  {% endif %}
 										          </div>
 										          <button type="submit" class="btn btn-primary">Edit</button>
 										        </form>
@@ -101,17 +118,17 @@
 										    </div>
 										  </div>
 										</div>
-		                <button class="btn btn-sm btn-danger delete-task" data-bs-toggle="modal" data-bs-target="#deleteTaskModal">Delete</button>
-		                <form id="completeTaskForm" method="POST" action="{% url 'mark_task_complete' task.id %}" class="d-inline-block">
+		                <button class="btn btn-sm btn-danger delete-task" data-bs-toggle="modal" data-bs-target="#deleteTaskModal_{{task.id}}">Delete</button>
+		                <form id="completeTaskForm_{{task.id}}" method="POST" action="{% url 'mark_task_complete' task.id %}" data-task-id="{{task.id}}" data-user-id="{{request.user.id}}" data-task-completed="{{task.completed}}" class="d-inline-block completeTaskForm">
 						        	{% csrf_token %}
 						          <button type="submit" class="btn btn-sm btn-success complete-task {% if task.completed %}complete-button{% endif %}">Complete</button>
 										</form>
 										<!-- Delete Task Modal -->
-										<div class="modal fade" id="deleteTaskModal" tabindex="-1" aria-labelledby="deleteTaskModalLabel" aria-hidden="true">
+										<div class="modal fade" id="deleteTaskModal_{{task.id}}" tabindex="-1" aria-labelledby="deleteTaskModalLabel_{{task.id}}" aria-hidden="true">
 										  <div class="modal-dialog modal-dialog-centered">
 										    <div class="modal-content">
 										      <div class="modal-header">
-										        <h5 class="modal-title" id="deleteTaskModalLabel">Edit Task</h5>
+										        <h5 class="modal-title" id="deleteTaskModalLabel_{{task.id}}">Delete Task</h5>
 										        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
 										      </div>
 										      <div class="modal-body">
@@ -119,7 +136,7 @@
 										      </div>
 										      <div class="modal-footer justify-content-center">
 										      	<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-										        <form id="deleteTaskForm" method="POST" action="{% url 'delete_task' task.id %}">
+										        <form id="deleteTaskForm_{{task.id}}" method="POST" action="{% url 'delete_task' task.id %}" class="deleteTaskForm" data-task-id="{{task.id}}" data-task-title="{{task.title}}">
 										        	{% csrf_token %}
 										          <button type="submit" class="btn btn-danger">Delete</button>
 										        </form>
@@ -149,33 +166,49 @@
       </div>
       <div class="modal-body">
         <!-- Add Task Form -->
-        <form id="addTaskForm" method="POST" action="{% url 'add_task' %}">
+        <form id="addTaskForm" method="POST" action="{% url 'add_task' %}" data-user-id="{{request.user.id}}">
         	{% csrf_token %}
-        	<input type="hidden" value="weekly" name="recurrent">
+        	<input type="hidden" value=True name="weekly">
           <div class="mb-3">
-            <label for="title" class="form-label">Title</label>
-            <input type="text" class="form-control" id="title" name="title" required>
+            <label for="{{ form.title.id_for_label }}" class="form-label">Title</label>
+            <input type="text" class="form-control {% if form.title.errors %} is-invalid{% endif %}" id="{{ form.title.id_for_label }}" name="{{ form.title.html_name }}" {% if form.title.field.required %}required{% endif %} autocomplete="off">
+					  {% if form.title.errors %}
+					    <div class="invalid-feedback">
+					      {% for error in form.title.errors %}
+					        {{ error }}
+					      {% endfor %}
+					    </div>
+					  {% endif %}
           </div>
           <div class="mb-3">
-            <label for="description" class="form-label">Description</label>
-            <textarea class="form-control" id="description" name="description" rows="3"></textarea>
+            <label for="{{ form.description.id_for_label }}" class="form-label">Description</label>
+            <textarea class="form-control {% if form.description.errors %} is-invalid{% endif %}" id="{{ form.description.id_for_label }}" name="{{ form.description.html_name }}" rows="3" {% if form.description.field.required %}required{% endif %}></textarea>
+					  {% if form.description.errors %}
+					    <div class="invalid-feedback">
+					      {% for error in form.description.errors %}
+					        {{ error }}
+					      {% endfor %}
+					    </div>
+					  {% endif %}
           </div>
           <div class="mb-3">
-            <label for="execution_day" class="form-label">Execution Day</label>
-            <select class="form-control select-day" id="execution_day" name="execution_day" required>
-            	<option value="">Select Day</option>
-            	<option value="Sunday">Sunday</option>
-            	<option value="Monday">Monday</option>
-            	<option value="Tuesday">Tuesday</option>
-            	<option value="Wednesday">Wednesday</option>
-            	<option value="Thursday">Thursday</option>
-            	<option value="Friday">Friday</option>
-            	<option value="Saturday">Saturday</option>
+            <label for="{{ form.execution_day.id_for_label }}" class="form-label">Execution Day</label>
+            <select class="form-control select-day select2{% if form.execution_day.errors %} is-invalid{% endif %}" id="{{ form.execution_day.id_for_label }}" name="{{ form.execution_day.html_name }}" required>
+              {% for value, label in form.execution_day.field.widget.choices %}
+              <option value="{{ value }}">{{ label }}</option>
+              {% endfor %}
             </select>
           </div>
           <div class="mb-3">
-            <label for="execution_time">Execution Time</label>
-            <input type="time" class="form-control" name="execution_time" required>
+            <label for="{{ form.execution_time.id_for_label }}" class="form-label">Execution Time</label>
+            <input type="time" class="form-control {% if form.execution_time.errors %} is-invalid{% endif %}" id="{{ form.execution_time.id_for_label }}" name="{{ form.execution_time.html_name }}" required>
+					  {% if form.description.errors %}
+					    <div class="invalid-feedback">
+					      {% for error in form.description.errors %}
+					        {{ error }}
+					      {% endfor %}
+					    </div>
+					  {% endif %}
           </div>
           <button type="submit" class="btn btn-primary">Add</button>
         </form>
@@ -189,9 +222,58 @@
     // DataTable Initialization
     var dataTable = $('#task-table').DataTable({
     "columnDefs": [
-      { "width": "17vw", "targets": 2 } // Set width of the third column (index 2) to 100px
+      { "width": "16vw", "targets": 2 } // Set width of the third column (index 2) to 100px
     ]
   	});
+
+    function initializeSelect2(modalId) {
+      var select = $('#' + modalId + ' .select2');
+      if (select.length > 0) {
+        select.select2({
+          dropdownParent: $('#' + modalId), // Set the dropdownParent to the modal element
+          width: '100%' // Set the initial width to 100%
+        });
+
+        select.on('select2:select', function (e) {
+          var value = e.target.value;
+          if (value !== '') {
+            $('option[value=""]').prop('disabled', true);
+          }
+        });
+
+        // Calculate and set the maximum width for the select options
+        var maxWidth = 0;
+        select.find('option').each(function () {
+          var optionWidth = $(this).text().length;
+          if (optionWidth > maxWidth) {
+            maxWidth = optionWidth;
+          }
+        });
+
+        // Set the width of the dropdown to the calculated maximum width
+        select.select2('destroy'); // Destroy the initial Select2 instance
+        select.select2({
+          dropdownParent: $('#' + modalId), // Set the dropdownParent to the modal element
+          width: (maxWidth * 12) + 'px' // Set the width based on the maximum width of options
+        });
+
+        select.on('select2:select', function (e) {
+          var value = e.target.value;
+          if (value !== '') {
+            $('option[value=""]').prop('disabled', true);
+          }
+        });
+      }
+    }
+
+    // Initialize Select2 for addTaskModal
+    initializeSelect2('addTaskModal');
+
+    // Initialize Select2 for each editTaskModal (if there are multiple)
+    {% for task in tasks %}
+    initializeSelect2('editTaskModal_{{ task.id }}');
+    {% endfor %}
+
   });
 </script>
 {% endblock %}

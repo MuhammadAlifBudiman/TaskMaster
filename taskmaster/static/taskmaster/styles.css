@@ -390,7 +390,7 @@ span.badge.bg-light.not-completed {
   }
 }
 
-.invalid-feedback {
+.invalid-feedback.position-absolute.pe-3.top-0.start-100.text-start {
   background-color: yellow;
   color: black;
   border: 1px solid black;
@@ -402,11 +402,12 @@ span.badge.bg-light.not-completed {
   transition: opacity 0.3s ease-in-out;
 }
 
-.invalid-feedback.show {
+
+.invalid-feedback.position-absolute.pe-3.top-0.start-100.text-start.show {
   opacity: 1;
 }
 
-.invalid-feedback::before {
+.invalid-feedback.position-absolute.pe-3.top-0.start-100.text-start::before {
   content: "";
   position: absolute;
   top: 0;
@@ -418,13 +419,17 @@ span.badge.bg-light.not-completed {
   border-right: 8px solid yellow;
 }
 
+.select2-results__option {
+    color: black; /* Change the font color to your desired color */
+  }
+
 @media screen and (max-width: 767px) {
-  .invalid-feedback.position-absolute {
+  .invalid-feedback.position-absolute.pe-3.top-0.start-100.text-start {
     position: relative!important;
     left: 0!important;
   }
 
-  .invalid-feedback::before {
+  .invalid-feedback.position-absolute.pe-3.top-0.start-100.text-start::before {
     content: "";
     position: absolute;
     top: -8px;

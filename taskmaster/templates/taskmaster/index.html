@@ -4,8 +4,9 @@
 {% block content %}
 <div class="container">
   <div class="row justify-content-center mt-5">
-    <div class="col-md-6 text-center">
+    <div class="col-md-12 text-center">
       <h2>Welcome, {{ user.username }}</h2>
+
       {% if completed_daily_tasks == total_daily_tasks and  total_daily_tasks != 0 %}
       <h5 class="text-success">You Have Completed All Daily Task</h5>
       {% elif completed_daily_tasks != total_daily_tasks and  total_daily_tasks != 0  %}
@@ -13,6 +14,7 @@
       {% else %}
       <h5>Add New Daily Task</h5>
       {% endif %}
+
       {% if completed_weekly_tasks == total_weekly_tasks and total_weekly_tasks != 0 %}
       <h5 class="text-success">You Have Completed All Weekly Task</h5>
       {% elif completed_weekly_tasks != total_weekly_tasks and total_weekly_tasks != 0 %}
@@ -20,25 +22,43 @@
       {% else %}
       <h5>Add New Weekly Task</h5>
       {% endif %}
+
+      {% if completed_monthly_tasks == total_monthly_tasks and total_monthly_tasks != 0 %}
+      <h5 class="text-success">You Have Completed All Weekly Task</h5>
+      {% elif completed_monthly_tasks != total_monthly_tasks and total_monthly_tasks != 0 %}
+      <h5 class="not-complete"> You have {{ completed_monthly_tasks }}/{{ total_monthly_tasks }} monthly tasks to complete</h5>
+      {% else %}
+      <h5>Add New Monthly Task</h5>
+      {% endif %}
+
       {% if completed_all_tasks %}
       <h1 class="text-success">Good Job <i class="uil uil-thumbs-up"></i></h1>
       {% endif %}
+
       <div class="row">
-        <div class="col-md-6 mt-2 d-inline-block position-relative">
+        <div class="col-md-4 mt-2 d-inline-block position-relative">
           <a href="{% url 'dailytask' %}" class="btn btn-primary btn-lg">
             Daily Task
           </a>
           {% if remaining_daily_tasks != 0 %} 
           <span class="badge rounded-pill position-absolute bottom-80 start-0 bg-danger fs-3">
             {{ remaining_daily_tasks }}
-          </span>
+          </span> 
           {% endif %}
         </div>
-        <div class="col-md-6 mt-2 d-inline-block position-relative">
+        <div class="col-md-4 mt-2 d-inline-block position-relative">
           <a href="{% url 'weeklytask' %}" class="btn btn-primary btn-lg">Weekly Task</a>
           {% if remaining_weekly_tasks != 0 %} 
           <span class="badge rounded-pill position-absolute bottom-80 start-0 bg-danger fs-3">
             {{ remaining_weekly_tasks }}
+          </span>
+          {% endif %}
+        </div>
+        <div class="col-md-4 mt-2 d-inline-block position-relative">
+          <a href="{% url 'monthlytask' %}" class="btn btn-primary btn-lg">Monthly Task</a>
+          {% if remaining_monthly_tasks != 0 %} 
+          <span class="badge rounded-pill position-absolute bottom-80 start-0 bg-danger fs-3">
+            {{ remaining_monthly_tasks }}
           </span>
           {% endif %}
         </div>
@@ -72,15 +92,5 @@
       // Handle any errors that occur during the request
       console.error('Request error:', error);
     });
-
-  {% if messages %}
-    {% for message in messages %}
-      {% if message.tags == 'success' %}
-        showAlert("{{ message }}");
-      {% elif message.tags == 'error' %}
-        showToast("{{ message }}", "error");
-      {% endif %}
-    {% endfor %}
-  {% endif %}
 </script>
 {% endblock %}

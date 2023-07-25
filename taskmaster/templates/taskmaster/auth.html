@@ -114,16 +114,5 @@
         </div>
     </div>
 </div>
-  <script>
-    {% if messages %}
-      {% for message in messages %}
-        {% if message.tags == 'success' %}
-          showAlert("{{ message }}");
-        {% elif message.tags == 'error' %}
-          showToast("{{ message }}", "error");
-        {% endif %}
-      {% endfor %}
-    {% endif %}
-  </script>
 
 {% endblock %}

@@ -1,4 +1,12 @@
 $(document).ready(function() {
+  if (typeof globalMessage !== 'undefined'){
+    if(typeof success !== 'undefined'){
+      showToast(globalMessage, success, 3000);
+    }else if(typeof error !== 'undefined'){
+      showToast(globalMessage, error, 3000);
+    }    
+  }
+
   var csrfToken = $('[name="csrfmiddlewaretoken"]').val();
   var togglePassword = $('.password-toggle')
   if (togglePassword.length > 0){
@@ -41,16 +49,6 @@ $(document).ready(function() {
       $taskDesc.find('.full-text').hide();
       $taskDesc.find('.see-more').show();
       $taskDesc.find('.see-less').hide();
-    });
-  }
-
-  var selectDay = $('.select-day')
-  if (selectDay.length > 0){
-    selectDay.on('change', function (e){
-      var value = e.target.value;
-      if (value !== '') {
-        $('option[value=""]').prop('disabled', true);
-      }
     });
   }
 
