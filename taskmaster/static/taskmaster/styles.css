@@ -373,7 +373,7 @@ span.badge.bg-light.not-completed {
   bottom: 80%;
 }
 
-.col-md-6.text-center h5.not-complete{
+.col-md-12.text-center h5.not-complete{
   color: #c4c3ca;
   animation: white-to-red 2s infinite;
 }
@@ -422,6 +422,10 @@ span.badge.bg-light.not-completed {
 .select2-results__option {
     color: black; /* Change the font color to your desired color */
   }
+
+.btn.export {
+  background-color: darkgreen;
+}
 
 @media screen and (max-width: 767px) {
   .invalid-feedback.position-absolute.pe-3.top-0.start-100.text-start {

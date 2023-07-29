@@ -8,17 +8,19 @@
       <div class="card">
         <div class="card-header">
           <h2>My Weekly Task List 
-        		{% if completed_tasks == total_tasks and total_tasks != 0 %}
-          	<span class="badge rounded-pill bg-light complete-all-task">
-	        		({{ completed_tasks }}/{{ total_tasks }})
-	        		<i class="uil uil-check-circle check-icon"></i>
-          	</span>
-        		{% elif completed_tasks != total_tasks and total_tasks != 0 %}
-          	<span class="badge rounded-pill bg-light not-completed">
-	        		({{ completed_tasks }}/{{ total_tasks }})
-	        		<i class="uil uil-times-circle cross-icon"></i>
-          	</span>
-        		{% endif %}
+          	<div id="taskCompletionBadge" class="d-inline-block"> 
+	        		{% if completed_tasks == total_tasks and total_tasks != 0 %}
+	          	<span class="badge rounded-pill bg-light complete-all-task">
+		        		({{ completed_tasks }}/{{ total_tasks }})
+		        		<i class="uil uil-check-circle check-icon"></i>
+	          	</span>
+	        		{% elif completed_tasks != total_tasks and total_tasks != 0 %}
+	          	<span class="badge rounded-pill bg-light not-completed">
+		        		({{ completed_tasks }}/{{ total_tasks }})
+		        		<i class="uil uil-times-circle cross-icon"></i>
+	          	</span>
+	        		{% endif %}
+          	</div>
           </h2>
         </div>
         <div class="card-body">
@@ -38,115 +40,6 @@
 	            </thead>
 	            <tbody>
 	              <!-- Task items will be dynamically populated here -->
-		            {% for task in tasks %}
-		            <tr data-id="{{ task.id }}" class="{% if task.completed %}completed{% endif %}">
-		              <td>{{ forloop.counter }}</td>
-		              <td>{{ task.title }}</td>
-								  <td>
-								    <div class="task-description">
-								      <p class="truncated-text">{{ task.description|truncatechars:100 }}</p>
-								      {% if task.description|length > 100 %}
-								      <a href="#" class="see-more text-decoration-none">See More</a>
-								      {% endif %}
-								      <p class="full-text">{{ task.description }}</p>
-								      {% if task.description|length > 100 %}
-								      <a href="#" class="see-less text-decoration-none">Less</a>
-								      {% endif %}
-								    </div>
-								  </td>
-		              <td>{{ task.created_at|date:'F d, Y' }}</td>
-		              <td>{{ task.execution_day }}, {{ task.execution_time }}</td>
-		              <td>
-		                <button class="btn btn-sm btn-primary edit-task" data-bs-toggle="modal" data-bs-target="#editTaskModal_{{task.id}}">Edit</button>
-										<!-- Edit Task Modal -->
-										<div class="modal fade" id="editTaskModal_{{task.id}}" tabindex="-1" aria-labelledby="editTaskModalLabel_{{task.id}}" aria-hidden="true">
-										  <div class="modal-dialog modal-dialog-centered">
-										    <div class="modal-content">
-										      <div class="modal-header">
-										        <h5 class="modal-title" id="editTaskModalLabel_{{task.id}}">Edit Task</h5>
-										        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-										      </div>
-										      <div class="modal-body">
-										        <!-- Edit Task Form -->
-										        <form id="editTaskForm_{{task.id}}" method="POST" action="{% url 'edit_task' task.id %}" data-task-id="{{task.id}}" data-user-id="{{request.user.id}}" class="editTaskForm">
-										        	{% csrf_token %}
-										        	<input type="hidden" value=True name="weekly">
-										          <div class="mb-3">
-										            <label for="{{ form.title.id_for_label }}_edit_{{task.id}}" class="form-label">Title</label>
-										            <input type="text" class="form-control {% if form.title.errors %} is-invalid{% endif %}" id="{{ form.title.id_for_label }}_edit_{{task.id}}" name="{{ form.title.html_name }}" value="{{ task.title }}" {% if form.title.field.required %}required{% endif %} autocomplete="off">
-															  {% if form.title.errors %}
-															    <div class="invalid-feedback">
-															      {% for error in form.title.errors %}
-															        {{ error }}
-															      {% endfor %}
-															    </div>
-															  {% endif %}
-										          </div>
-										          <div class="mb-3">
-										            <label for="{{ form.description.id_for_label }}_edit_{{task.id}}" class="form-label">Description</label>
-										            <textarea class="form-control {% if form.description.errors %} is-invalid{% endif %}" id="{{ form.description.id_for_label }}_edit_{{task.id}}" name="{{ form.description.html_name }}" rows="3" {% if form.description.field.required %}required{% endif %}>{{ task.description }}</textarea>
-															  {% if form.description.errors %}
-															    <div class="invalid-feedback">
-															      {% for error in form.description.errors %}
-															        {{ error }}
-															      {% endfor %}
-															    </div>
-															  {% endif %}
-										          </div>
-										          <div class="mb-3">
-										            <label for="{{ form.execution_day.id_for_label }}_edit_{{task.id}}" class="form-label">Execution Day</label>
-										            <select class="form-control select-day select2{% if form.execution_day.errors %} is-invalid{% endif %}" id="{{ form.execution_day.id_for_label }}_edit_{{task.id}}" name="{{ form.execution_day.html_name }}" {% if form.execution_day.field.required %}required{% endif %}>
-								                  {% for value, label in form.execution_day.field.widget.choices %}
-								                  <option value="{{ value }}" {% if value == task.execution_day %}selected{% endif %}>{{ label }}</option>
-								                  {% endfor %}
-										            </select>
-										          </div>
-										          <div class="mb-3">
-										            <label for="{{ form.execution_time.id_for_label }}_edit_{{task.id}}" class="form-label">Execution Time</label>
-										            <input type="time" class="form-control {% if form.execution_time.errors %} is-invalid{% endif %}" id="{{ form.execution_time.id_for_label }}_edit_{{task.id}}" name="{{ form.execution_time.html_name }}" value="{{ task.execution_time|time:'H:i' }}" required>
-															  {% if form.execution_time.errors %}
-															    <div class="invalid-feedback">
-															      {% for error in form.execution_time.errors %}
-															        {{ error }}
-															      {% endfor %}
-															    </div>
-															  {% endif %}
-										          </div>
-										          <button type="submit" class="btn btn-primary">Edit</button>
-										        </form>
-										      </div>
-										    </div>
-										  </div>
-										</div>
-		                <button class="btn btn-sm btn-danger delete-task" data-bs-toggle="modal" data-bs-target="#deleteTaskModal_{{task.id}}">Delete</button>
-		                <form id="completeTaskForm_{{task.id}}" method="POST" action="{% url 'mark_task_complete' task.id %}" data-task-id="{{task.id}}" data-user-id="{{request.user.id}}" data-task-completed="{{task.completed}}" class="d-inline-block completeTaskForm">
-						        	{% csrf_token %}
-						          <button type="submit" class="btn btn-sm btn-success complete-task {% if task.completed %}complete-button{% endif %}">Complete</button>
-										</form>
-										<!-- Delete Task Modal -->
-										<div class="modal fade" id="deleteTaskModal_{{task.id}}" tabindex="-1" aria-labelledby="deleteTaskModalLabel_{{task.id}}" aria-hidden="true">
-										  <div class="modal-dialog modal-dialog-centered">
-										    <div class="modal-content">
-										      <div class="modal-header">
-										        <h5 class="modal-title" id="deleteTaskModalLabel_{{task.id}}">Delete Task</h5>
-										        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-										      </div>
-										      <div class="modal-body">
-										        <h3>Are you sure you want to delete task {{ task.title }} ?</h3>
-										      </div>
-										      <div class="modal-footer justify-content-center">
-										      	<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-										        <form id="deleteTaskForm_{{task.id}}" method="POST" action="{% url 'delete_task' task.id %}" class="deleteTaskForm" data-task-id="{{task.id}}" data-task-title="{{task.title}}">
-										        	{% csrf_token %}
-										          <button type="submit" class="btn btn-danger">Delete</button>
-										        </form>
-										      </div>
-										    </div>
-										  </div>
-										</div>
-		              </td>
-		            </tr>
-		            {% endfor %}
 	            </tbody>
 	          </table>
 			</div>
@@ -166,34 +59,20 @@
       </div>
       <div class="modal-body">
         <!-- Add Task Form -->
-        <form id="addTaskForm" method="POST" action="{% url 'add_task' %}" data-user-id="{{request.user.id}}">
+        <form id="addTaskForm" method="POST" data-user-id="{{request.user.id}}">
         	{% csrf_token %}
         	<input type="hidden" value=True name="weekly">
           <div class="mb-3">
             <label for="{{ form.title.id_for_label }}" class="form-label">Title</label>
             <input type="text" class="form-control {% if form.title.errors %} is-invalid{% endif %}" id="{{ form.title.id_for_label }}" name="{{ form.title.html_name }}" {% if form.title.field.required %}required{% endif %} autocomplete="off">
-					  {% if form.title.errors %}
-					    <div class="invalid-feedback">
-					      {% for error in form.title.errors %}
-					        {{ error }}
-					      {% endfor %}
-					    </div>
-					  {% endif %}
           </div>
           <div class="mb-3">
             <label for="{{ form.description.id_for_label }}" class="form-label">Description</label>
             <textarea class="form-control {% if form.description.errors %} is-invalid{% endif %}" id="{{ form.description.id_for_label }}" name="{{ form.description.html_name }}" rows="3" {% if form.description.field.required %}required{% endif %}></textarea>
-					  {% if form.description.errors %}
-					    <div class="invalid-feedback">
-					      {% for error in form.description.errors %}
-					        {{ error }}
-					      {% endfor %}
-					    </div>
-					  {% endif %}
           </div>
           <div class="mb-3">
             <label for="{{ form.execution_day.id_for_label }}" class="form-label">Execution Day</label>
-            <select class="form-control select-day select2{% if form.execution_day.errors %} is-invalid{% endif %}" id="{{ form.execution_day.id_for_label }}" name="{{ form.execution_day.html_name }}" required>
+            <select class="form-control select-day select2{% if form.execution_day.errors %} is-invalid{% endif %}" id="{{ form.execution_day.id_for_label }}" name="{{ form.execution_day.html_name }}" {% if form.execution_day.field.required %}required{% endif %}>
               {% for value, label in form.execution_day.field.widget.choices %}
               <option value="{{ value }}">{{ label }}</option>
               {% endfor %}
@@ -201,14 +80,7 @@
           </div>
           <div class="mb-3">
             <label for="{{ form.execution_time.id_for_label }}" class="form-label">Execution Time</label>
-            <input type="time" class="form-control {% if form.execution_time.errors %} is-invalid{% endif %}" id="{{ form.execution_time.id_for_label }}" name="{{ form.execution_time.html_name }}" required>
-					  {% if form.description.errors %}
-					    <div class="invalid-feedback">
-					      {% for error in form.description.errors %}
-					        {{ error }}
-					      {% endfor %}
-					    </div>
-					  {% endif %}
+            <input type="time" class="form-control {% if form.execution_time.errors %} is-invalid{% endif %}" id="{{ form.execution_time.id_for_label }}" name="{{ form.execution_time.html_name }}" {% if form.execution_date.field.required %}required{% endif %}>
           </div>
           <button type="submit" class="btn btn-primary">Add</button>
         </form>
@@ -217,62 +89,161 @@
   </div>
 </div>
 
+<!-- Edit Task Modal -->
+<div class="modal fade" id="editTaskModal" tabindex="-1" aria-labelledby="editTaskModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="editTaskModalLabel">Edit Task</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <!-- Edit Task Form -->
+        <form id="editTaskForm" method="POST" data-user-id="{{request.user.id}}" class="editTaskForm">
+        	{% csrf_token %}
+        	<input type="hidden" value=True name="weekly">
+          <div class="mb-3">
+            <label for="{{ form.title.id_for_label }}_edit" class="form-label">Title</label>
+            <input type="text" class="form-control {% if form.title.errors %} is-invalid{% endif %}" id="{{ form.title.id_for_label }}_edit" name="{{ form.title.html_name }}" {% if form.title.field.required %}required{% endif %} autocomplete="off">
+          </div>
+          <div class="mb-3">
+            <label for="{{ form.description.id_for_label }}_edit" class="form-label">Description</label>
+            <textarea class="form-control {% if form.description.errors %} is-invalid{% endif %}" id="{{ form.description.id_for_label }}_edit" name="{{ form.description.html_name }}" rows="3" {% if form.description.field.required %}required{% endif %}></textarea>
+          </div>
+          <div class="mb-3">
+            <label for="{{ form.execution_day.id_for_label }}_edit" class="form-label">Execution Day</label>
+            <select class="form-control select-day select2{% if form.execution_day.errors %} is-invalid{% endif %}" id="{{ form.execution_day.id_for_label }}_edit" name="{{ form.execution_day.html_name }}" {% if form.execution_day.field.required %}required{% endif %}>
+              {% for value, label in form.execution_day.field.widget.choices %}
+              <option value="{{ value }}">{{ label }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="mb-3">
+            <label for="{{ form.execution_time.id_for_label }}_edit" class="form-label">Execution Time</label>
+            <input type="time" class="form-control {% if form.execution_time.errors %} is-invalid{% endif %}" id="{{ form.execution_time.id_for_label }}_edit" name="{{ form.execution_time.html_name }}" {% if form.execution_date.field.required %}required{% endif %}>
+          </div>
+          <button type="submit" class="btn btn-primary">Edit</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Delete Task Modal -->
+<div class="modal fade" id="deleteTaskModal" tabindex="-1" aria-labelledby="deleteTaskModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="deleteTaskModalLabel">Delete Task</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <h3 class="delete-confirm"></h3>
+      </div>
+      <div class="modal-footer justify-content-center">
+      	<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        <form id="deleteTaskForm" method="POST" class="deleteTaskForm">
+        	{% csrf_token %}
+          <button type="submit" class="btn btn-danger">Delete</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Complete Task Form -->
+<form id="completeTaskForm" method="POST" data-user-id="{{request.user.id}}" class="d-inline-block completeTaskForm">
+	{% csrf_token %}
+</form>
+
 <script>
   $(document).ready(function() {
+
+		var customDayOrder = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
     // DataTable Initialization
-    var dataTable = $('#task-table').DataTable({
-    "columnDefs": [
-      { "width": "16vw", "targets": 2 } // Set width of the third column (index 2) to 100px
-    ]
-  	});
+		var dataTable = $('#task-table').DataTable({
+		  "ajax": {
+		    "url": "/api/tasks/?weekly=true&user_id={{user.id}}", // Replace this with the URL of your API endpoint that returns the JSON 
+		    "dataSrc": "" // Use an empty string since the API returns an array directly
+		  },
+		  "columnDefs": [
+		    { "targets": 0,
+		      "createdCell": function (td, cellData, rowData, row, col) {
+		        // Add the "task-num" class to the td element in the first column (index 0)
+		        $(td).addClass("task-num");
+		      },
+		  	},
+		    { "targets": 1,
+		      "createdCell": function (td, cellData, rowData, row, col) {
+		        // Add the "task-num" class to the td element in the first column (index 0)
+		        $(td).addClass("task-title");
+		      }
+		  	},
+		    { "targets": 4,
+		      "createdCell": function (td, cellData, rowData, row, col) {
+		        // Add the "task-num" class to the td element in the first column (index 0)
+		        $(td).addClass("task-execution-time");
+		      },
+		      "type": "custom-datetime",
+		  	},
+		    { "width": "14vw", "targets": 2 }, // Set width of the third column (index 2) to 100px
+		  ],
+		  "columns": [
+		    { "data": null, "render": function(data, type, row, meta) {
+		      // Use "render" function to display the row number in the first column
+		      return meta.row + 1 ;
+		    }},
+		    { "data": "title" },
+		    { "data": null, "render": function(data, type, row) {
+		      // Use "render" function to display truncated text for description column
+	        return `<div class="task-description">
+	               <p class="truncated-text">${row.description.substring(0, 100)}</p>
+	               ${row.description.length > 100 ? '<a href="#" class="see-more text-decoration-none">See More</a>' : ''}
+	               <p class="full-text">${row.description}</p>
+	               ${row.description.length > 100 ? '<a href="#" class="see-less text-decoration-none">Less</a>' : ''}
+	               </div>`;
+		    }},
+		    { "data": null, "render": function(data, type, row) {
+		      // Use "render" function to display formatted date for created_at column
+		      return row.created_at ? moment(row.created_at).format('MMMM DD, YYYY') : '';
+		    }},
+		    { "data": null, "render": function(data, type, row) {
+	        const executionDay = row.execution_day ? moment().day(row.execution_day).format('dddd') : '';
+	        const executionTime = row.execution_time ? moment(row.execution_time, 'HH:mm:ss').format('hh:mm A') : '';
+	        return `${executionDay} ${executionTime}`;
+		    }, "type": "custom-datetime",},
+		    { "data": null, "render": function(data, type, row) {
+		      // Use "render" function to display action buttons in the last column
+	        return `<button class="btn btn-sm btn-primary edit-task" data-bs-toggle="modal" data-bs-target="#editTaskModal" data-task-id="${row.id}">Edit</button>
+	               <button class="btn btn-sm btn-danger delete-task" data-bs-toggle="modal" data-bs-target="#deleteTaskModal" data-task-id="${row.id}" data-task-title="${row.title}">Delete</button>
+	               <button type="submit" class="btn btn-sm btn-success complete-task ${row.completed ? 'complete-button' : ''}" data-task-completed="${row.completed}" data-task-id="${row.id}">${row.completed ? 'uncomplete' : 'complete'}</button>`;
+		    }}
+		  ],
+		  "createdRow": function(row, data, dataIndex) {
+		    // Add necessary attributes to the row during creation
+		    $(row).attr('id', data.id);
+		    $(row).attr('data-id', data.id);
+		    if (data.completed) {
+		      $(row).addClass('completed');
+		    }
+		  }
+		});
 
-    function initializeSelect2(modalId) {
-      var select = $('#' + modalId + ' .select2');
-      if (select.length > 0) {
-        select.select2({
-          dropdownParent: $('#' + modalId), // Set the dropdownParent to the modal element
-          width: '100%' // Set the initial width to 100%
-        });
-
-        select.on('select2:select', function (e) {
-          var value = e.target.value;
-          if (value !== '') {
-            $('option[value=""]').prop('disabled', true);
-          }
-        });
-
-        // Calculate and set the maximum width for the select options
-        var maxWidth = 0;
-        select.find('option').each(function () {
-          var optionWidth = $(this).text().length;
-          if (optionWidth > maxWidth) {
-            maxWidth = optionWidth;
-          }
-        });
-
-        // Set the width of the dropdown to the calculated maximum width
-        select.select2('destroy'); // Destroy the initial Select2 instance
-        select.select2({
-          dropdownParent: $('#' + modalId), // Set the dropdownParent to the modal element
-          width: (maxWidth * 12) + 'px' // Set the width based on the maximum width of options
-        });
-
-        select.on('select2:select', function (e) {
-          var value = e.target.value;
-          if (value !== '') {
-            $('option[value=""]').prop('disabled', true);
-          }
-        });
-      }
-    }
+		customDaySorting(customDayOrder);
 
     // Initialize Select2 for addTaskModal
     initializeSelect2('addTaskModal');
 
-    // Initialize Select2 for each editTaskModal (if there are multiple)
-    {% for task in tasks %}
-    initializeSelect2('editTaskModal_{{ task.id }}');
-    {% endfor %}
+    // Initialize Select2 for editTaskModal 
+    initializeSelect2('editTaskModal');
+
+		addTaskHandler(dataTable);
+
+		deleteTaskHandler(dataTable);
+
+		completeTaskHandler(dataTable);
+
+		editTaskHandler();
 
   });
 </script>

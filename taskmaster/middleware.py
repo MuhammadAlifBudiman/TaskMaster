@@ -7,7 +7,7 @@ class TimezoneMiddleware:
 
     def __call__(self, request):
         if request.user.is_authenticated:
-            userprofile = UserProfile.objects.get(user=request.user)
+            userprofile, _ = UserProfile.objects.get_or_create(user=request.user)
             user_timezone = userprofile.timezone
 
             # Activate the user's timezone

@@ -4,3 +4,5 @@ python-decouple
 parameterized
 djangorestframework
 djangorestframework-simplejwt
+pytz
+openpyxl

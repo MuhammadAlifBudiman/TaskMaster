@@ -2,42 +2,13 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
 from django.contrib import messages
-from django.http import JsonResponse, HttpResponseRedirect
+from openpyxl import Workbook
+from openpyxl.styles import Font, Alignment, PatternFill, Border, Side
+from openpyxl.utils import get_column_letter
+from django.http import HttpResponse
 from .forms.forms import *
-import json
 from .models import *
-from rest_framework import viewsets, status
 from .serializers.serializers import *
-
-class TaskViewSet(viewsets.ModelViewSet):
-    serializer_class = TaskSerializer
-
-    def get_queryset(self):
-        queryset = Task.objects.all()
-        user_id = self.request.query_params.get('user_id')
-        daily = self.request.query_params.get('daily')
-        weekly = self.request.query_params.get('weekly')
-        monthly = self.request.query_params.get('monthly')
-        completed = self.request.query_params.get('completed')
-        days = self.request.query_params.get('days')
-        date = self.request.query_params.get('days')
-
-        if user_id:
-            queryset = queryset.filter(user=user_id)
-        if daily == 'true':
-            queryset = queryset.filter(daily=True)
-        if weekly == 'true':
-            queryset = queryset.filter(weekly=True)
-        if monthly == 'true':
-            queryset = queryset.filter(monthly=True)
-        if completed == 'true':
-            queryset = queryset.filter(completed=True)
-        if days:
-            queryset = queryset.filter(execution_day=days.capitalize())
-        if date:
-            queryset = queryset.filter(execution_date=date)
-
-        return queryset
 
 
 def index(request):
@@ -56,7 +27,7 @@ def index(request):
     total_monthly_tasks = Task.objects.filter(monthly=True, user=request.user).count()
     remaining_monthly_tasks = total_monthly_tasks - completed_monthly_tasks
 
-    completed_all_tasks = (completed_daily_tasks+completed_weekly_tasks) == (total_daily_tasks+total_weekly_tasks) and (total_daily_tasks+total_weekly_tasks) != 0
+    completed_all_tasks = (completed_daily_tasks+completed_weekly_tasks+completed_monthly_tasks) == (total_daily_tasks+total_weekly_tasks+total_monthly_tasks) and (total_daily_tasks+total_weekly_tasks+total_monthly_tasks) != 0
 
     return render(request, 'taskmaster/index.html', 
             {
@@ -202,8 +173,6 @@ def add_task(request):
             else:
                 return redirect('index')
 
-     
-
 
 def edit_task(request, task_id):
     if request.method == 'POST':
@@ -232,7 +201,6 @@ def edit_task(request, task_id):
                 return redirect('index')
 
 
-
 def delete_task(request, task_id):
     if request.method == 'POST':
         task = get_object_or_404(Task, id=task_id, user=request.user)
@@ -246,8 +214,6 @@ def delete_task(request, task_id):
             return redirect('weeklytask')
         elif task.monthly:
             return redirect('monthlytask')
-
-    
 
 
 def mark_task_complete(request, task_id):
@@ -266,38 +232,83 @@ def mark_task_complete(request, task_id):
             return redirect('monthlytask')
 
 
+def export_task_to_excel(request):
+    if not request.user.is_authenticated:
+        return redirect('auth')
+
+    # Create a new Excel workbook
+    workbook = Workbook()
+
+    # Write headers for each table section
+    task_types = ["Daily", "Weekly", "Monthly"]
+
+    # Function to write section header
+    def write_section_header(section_name):
+        nonlocal row_index
+        sheet.merge_cells(start_row=row_index, start_column=1, end_row=row_index, end_column=len(headers))
+        merged_cell = sheet.cell(row=row_index, column=1, value=section_name)
+        merged_cell.font = Font(bold=True)
+        merged_cell.alignment = Alignment(horizontal='center')
+        merged_cell.fill = PatternFill(start_color='999999', end_color='999999', fill_type='solid')
+
+        for col_index, header in enumerate(headers, start=1):
+            sheet.cell(row=row_index + 1, column=col_index, value=header).font = Font(bold=True)
+            sheet.cell(row=row_index + 1, column=col_index).alignment = Alignment(horizontal='center')
+            sheet.cell(row=row_index + 1, column=col_index).fill = PatternFill(start_color='C0C0C0', end_color='C0C0C0', fill_type='solid')
+            col_letter = get_column_letter(col_index)
+            column_width = len(header) + 2  # Adjust width based on header length
+            sheet.column_dimensions[col_letter].width = column_width
+        row_index += 2
+
     
+    for task_type in task_types:
+        # Create a new sheet for each task type
+        sheet = workbook.create_sheet(title=task_type)
 
+        # Write headers for each table section
+        headers = ["Date", "Title", "Description", "Execution_time", "Completed"]
 
-#API
+        row_index = 1
 
-def set_timezone(request):
-    """
-    docstirng for documentations
-    """
-    if request.method == 'POST':
-        # Get the JSON data from the request body
-        data = json.loads(request.body)
+        write_section_header(task_type)
 
-        # Extract the timeZone value from the JSON data
-        time_zone = data.get('timeZone')
-        # Get the user's profile or create it if it doesn't exist
-        profile, created = UserProfile.objects.get_or_create(user=request.user)
-        if created:
-            profile = profile[0]  # Access the created profile from the tuple
-        profile.timezone = time_zone
-        profile.save()
+        # Fetch and populate tasks for each type
+        tasks = TaskHistory.objects.filter(task_type=task_type.lower(), user=request.user)
+        for task in tasks:
+            execution_time = task.execution_time.strftime('%H:%M')
+            if task.task_type == 'daily':
+                data = [task.date.strftime('%d-%m-%Y'), task.title, task.description, execution_time, 'yes' if task.completed else 'no']
+            elif task.task_type == 'weekly':
+                data = [task.date.strftime('%d-%m-%Y'), task.title, task.description, f'{task.execution_day}, {execution_time}', 'yes' if task.completed else 'no']
+            else:
+                data = [task.date.strftime('%d-%m-%Y'), task.title, task.description, f'Day {task.execution_date}, {execution_time}', 'yes' if task.completed else 'no']
 
-        # Set the time zone for the current request
-        timezone.activate(time_zone)
-        return JsonResponse({'success': True})
+            for col_index, value in enumerate(data, start=1):
+                sheet.cell(row=row_index, column=col_index, value=value)
+                col_letter = get_column_letter(col_index)
+                column_width = len(str(value)) + 2  # Adjust width based on content length
+                if sheet.column_dimensions[col_letter].width < column_width:
+                    sheet.column_dimensions[col_letter].width = column_width if column_width < 30 else 30
+            row_index += 1
 
+        # Add a border to the table
+        table_start_row = row_index - len(tasks) - 2
+        table_end_row = row_index - 1
+        for col_index in range(1, len(headers) + 1):
+            col_letter = get_column_letter(col_index)
+            side = Side(border_style='thin', color='000000')
+            border = Border(top=side, bottom=side, left=side, right=side)
+            for row in range(table_start_row, table_end_row + 1):
+                sheet.cell(row=row, column=col_index).border = border
 
-def check_username_availability(request):
-    if request.method == 'POST':
-        username = request.POST.get('username')
-        response_data = {'is_available': not User.objects.filter(username=username).exists()}
-        return JsonResponse(response_data)
-    return JsonResponse({'is_available': False})
+        row_index += 1
 
+    # Remove the default 'Sheet' that is automatically created when the workbook is initialized
+    workbook.remove(workbook['Sheet'])
 
+    # Create the response with the Excel file
+    response = HttpResponse(content_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+    response["Content-Disposition"] = f"attachment; filename=Task_Master_Data_{request.user.username}.xlsx"
+    workbook.save(response)
+
+    return response
