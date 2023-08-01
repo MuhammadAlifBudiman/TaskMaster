@@ -1,18 +1,30 @@
-from rest_framework import viewsets, status
+from rest_framework import viewsets, status, permissions
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from django.db.models import Case, When, Value
 import json
-from django.http import JsonResponse, HttpResponseRedirect
+from django.http import JsonResponse, HttpResponseRedirect, Http404
 from django.contrib.auth.models import User
 from ..forms.forms import *
 from ..models import *
 from ..serializers.serializers import *
+from drf_yasg.utils import swagger_auto_schema
 
 class TaskViewSet(viewsets.ModelViewSet):
+    """
+    ViewSet for handling Task operations.
+    """
     serializer_class = TaskSerializer
 
+    # permission class set to be unauthenticated
+    permission_classes = (permissions.AllowAny,)
+    
+    # this is where the drf-yasg gets invoked
+    @swagger_auto_schema(request_body=serializer_class)
     def get_queryset(self):
+        """
+        Get the queryset for Task model based on query parameters.
+        """
         queryset = Task.objects.all()
         user_id = self.request.query_params.get('user_id')
         daily = self.request.query_params.get('daily')
@@ -20,7 +32,34 @@ class TaskViewSet(viewsets.ModelViewSet):
         monthly = self.request.query_params.get('monthly')
         completed = self.request.query_params.get('completed')
         days = self.request.query_params.get('days')
-        date = self.request.query_params.get('days')
+        date = self.request.query_params.get('date')
+
+        # Ensure user_id is an integer
+        if user_id is not None:
+            try:
+                user_id = int(user_id)
+            except ValueError:
+                # Handle the case where the 'user_id' parameter is not a valid integer
+                # You can raise an exception, log an error, or take other appropriate actions.
+                raise Http404
+
+        # Ensure date is an integer
+        if date is not None:
+            try:
+                date = int(date)
+            except ValueError:
+                # Handle the case where the 'date' parameter is not a valid integer
+                # You can raise an exception, log an error, or take other appropriate actions.
+                raise Http404
+
+        # Ensure days is within the allowed list
+        allowed_days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
+        if days and days.capitalize() not in allowed_days:
+            raise Http404
+
+        # Ensure date is within the allowed range
+        if date and int(date) not in range(1, 32):
+            raise Http404
 
         if user_id:
             queryset = queryset.filter(user=user_id)
@@ -30,7 +69,7 @@ class TaskViewSet(viewsets.ModelViewSet):
         if weekly == 'true':
             queryset = queryset.filter(weekly=True)
             day_order = {'Monday': 1, 'Tuesday': 2, 'Wednesday': 3, 'Thursday': 4, 'Friday': 5, 'Saturday': 6, 'Sunday': 7}
-            queryset = queryset.order_by('completed', 
+            queryset = queryset.order_by('completed',
                                          Case(
                                              *[When(execution_day=day, then=Value(order)) for day, order in day_order.items()],
                                              default=8,
@@ -52,6 +91,16 @@ class TaskViewSet(viewsets.ModelViewSet):
 
     @action(detail=True, methods=['post'])
     def complete(self, request, pk=None):
+        """
+        Mark a task as completed or incomplete.
+
+        Parameters:
+            request: HTTP request object.
+            pk: Primary key of the task.
+
+        Returns:
+            Response with serialized task data.
+        """
         task = self.get_object()
         task.completed = not task.completed  # Toggle the 'completed' field
         task.save()
@@ -61,7 +110,13 @@ class TaskViewSet(viewsets.ModelViewSet):
 
 def set_timezone(request):
     """
-    docstirng for documentations
+    Set the timezone for the user's profile.
+
+    Parameters:
+        request: HTTP request object.
+
+    Returns:
+        JsonResponse with success status.
     """
     if request.method == 'POST':
         # Get the JSON data from the request body
@@ -76,12 +131,19 @@ def set_timezone(request):
         profile.timezone = time_zone
         profile.save()
 
-        # Set the time zone for the current request
-        timezone.activate(time_zone)
         return JsonResponse({'success': True})
 
 
 def check_username_availability(request):
+    """
+    Check the availability of a username.
+
+    Parameters:
+        request: HTTP request object.
+
+    Returns:
+        JsonResponse with is_available status.
+    """
     if request.method == 'POST':
         username = request.POST.get('username')
         response_data = {'is_available': not User.objects.filter(username=username).exists()}

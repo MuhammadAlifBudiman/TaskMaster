@@ -1,5 +1,7 @@
+/* Import Google Fonts for Poppins font family with various weights */
 @import url('https://fonts.googleapis.com/css?family=Poppins:400,500,600,700,800,900');
 
+/* Global styles for the body */
 body{
 	font-family: 'Poppins', sans-serif;
 	font-weight: 300;
@@ -9,6 +11,8 @@ body{
 	background-color: #1f2029;
 	overflow-x: hidden;
 }
+
+/* Styling for links */
 a {
 	cursor: pointer;
   transition: all 200ms linear;
@@ -22,11 +26,15 @@ a:hover {
 .link:hover {
   color: #ffeba7;
 }
+
+/* Paragraph styles */
 p {
   font-weight: 500;
   font-size: 14px;
   line-height: 1.7;
 }
+
+/* Header styles */
 h4 {
   font-weight: 600;
 }
@@ -35,6 +43,8 @@ h6 span{
   text-transform: uppercase;
   font-weight: 700;
 }
+
+/* General section styles */
 .section{
   position: relative;
   width: 100%;
@@ -43,6 +53,8 @@ h6 span{
 .full-height{
   min-height: 100vh;
 }
+
+/* Checkbox styles  */
 [type="checkbox"]:checked,
 [type="checkbox"]:not(:checked){
   position: absolute;
@@ -70,8 +82,8 @@ h6 span{
   border-radius: 50%;
   color: #ffeba7;
   background-color: #102770;
-  font-family: 'unicons';
-  content: '\eb4f';
+  font-family: 'unicons'; /* Font family for custom icons */
+  content: '\eb4f'; /* Custom icon arrow */
   z-index: 20;
   top: -10px;
   left: -10px;
@@ -84,7 +96,7 @@ h6 span{
   transform: translateX(44px) rotate(-270deg);
 }
 
-
+/* Styles for the 3D card */
 .card-3d-wrap {
   position: relative;
   max-width: 100%;
@@ -129,7 +141,7 @@ h6 span{
   transform: rotateY(180deg);
 }
 .checkbox:checked ~ .card-3d-wrap .card-3d-wrapper {
-  transform: rotateY(180deg);
+  transform: rotateY(180deg); /* Change back card and font card */
 }
 .center-wrap{
   position: absolute;
@@ -142,7 +154,7 @@ h6 span{
   display: block;
 }
 
-
+/* Form styles */
 .form-group{ 
   position: relative;
   display: block;
@@ -186,6 +198,7 @@ h6 span{
     transition: all 200ms linear;
 }
 
+/* Placeholder styles for form inputs */
 .form-group input:-ms-input-placeholder  {
   color: #c4c3ca;
   opacity: 0.7;
@@ -231,6 +244,7 @@ h6 span{
     transition: all 200ms linear;
 }
 
+/* Button styles */
 .btn{  
   border-radius: 4px;
   height: 44px;
@@ -271,6 +285,7 @@ h6 span{
   box-shadow: 0 8px 24px 0 rgba(16,39,112,.2);
 }
 
+/* Password icon style */
 .password-icon {
   position: absolute;
   top: 0;
@@ -284,6 +299,7 @@ h6 span{
     transition: all 200ms linear;
 }
 
+/* Specific button styles */
 .btn.btn-primary.btn-lg {
   font-size: 2em;
   height: 25vh;
@@ -322,10 +338,12 @@ h6 span{
   background-color: #6c757d;
 }
 
+/* Styles for completed tasks in the DataTable */
 table.dataTable tbody tr.completed {
   background-color: #e0e0e0;
 }
 
+/* Check icon style for completed tasks */
 .check-icon {
   font-size: 1.3em;
   text-align: left;
@@ -334,12 +352,14 @@ table.dataTable tbody tr.completed {
     transition: all 200ms linear;
 }
 
+/* Badge style for complete-all-task */
 span.badge.bg-light.complete-all-task {
   color: green;
   font-size: 1em;
   border: 5px solid green;;
 }
 
+/* Cross icon style for incomplete tasks */
 .cross-icon {
   font-size: 1.3em;
   text-align: left;
@@ -348,12 +368,14 @@ span.badge.bg-light.complete-all-task {
     transition: all 200ms linear;
 }
 
+/* Badge style for not-completed tasks */
 span.badge.bg-light.not-completed {
   color: red;
   font-size: 1em;
   border: 5px solid red;;
 }
 
+/* Styles for showing/hiding full text in task description */
 .task-description .full-text {
   display: none;
 }
@@ -369,6 +391,7 @@ span.badge.bg-light.not-completed {
   cursor: pointer;
 }
 
+/* Badge style for to notif user not-completed tasks */
 .bottom-80 {
   bottom: 80%;
 }
@@ -390,6 +413,11 @@ span.badge.bg-light.not-completed {
   }
 }
 
+/* 
+    Styles for displaying error messages for invalid form fields.
+*/
+
+/* Styling for the error message tooltip. */
 .invalid-feedback.position-absolute.pe-3.top-0.start-100.text-start {
   background-color: yellow;
   color: black;
@@ -402,11 +430,17 @@ span.badge.bg-light.not-completed {
   transition: opacity 0.3s ease-in-out;
 }
 
-
+/* 
+    Show the error message tooltip when the invalid class is added to the element. 
+    The tooltip becomes visible with a smooth transition.
+*/
 .invalid-feedback.position-absolute.pe-3.top-0.start-100.text-start.show {
   opacity: 1;
 }
 
+/* 
+    Creates an arrow-like shape pointing to the element that has the error message.
+*/
 .invalid-feedback.position-absolute.pe-3.top-0.start-100.text-start::before {
   content: "";
   position: absolute;
@@ -419,20 +453,40 @@ span.badge.bg-light.not-completed {
   border-right: 8px solid yellow;
 }
 
+/* 
+    Styling for the dropdown options in the select2 library.
+*/
 .select2-results__option {
     color: black; /* Change the font color to your desired color */
   }
 
+/* 
+    Styling for the export button with the "export" class.
+*/
 .btn.export {
   background-color: darkgreen;
 }
 
+/* 
+    Align table cells vertically to the top within the #task-table.
+*/
+#task-table tr td{
+  vertical-align: top;
+}
+
+/* 
+    Media query for screens with a width of 767 pixels or less.
+    Adjusts the position of the error message tooltip for smaller screens.
+*/
 @media screen and (max-width: 767px) {
   .invalid-feedback.position-absolute.pe-3.top-0.start-100.text-start {
     position: relative!important;
     left: 0!important;
   }
 
+  /* 
+      Changes the arrow-like shape pointing to the element on smaller screens.
+  */
   .invalid-feedback.position-absolute.pe-3.top-0.start-100.text-start::before {
     content: "";
     position: absolute;

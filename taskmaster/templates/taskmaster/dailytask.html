@@ -1,5 +1,7 @@
 {% extends 'taskmaster/layout.html' %}
 
+{% block title %}{{ block.super }} - Daily Task{% endblock %}
+
 {% block content %}
 <div class="container container-task">
   <div class="row justify-content-center mt-5">
@@ -25,23 +27,21 @@
         <div class="card-body">
         	<a type="button" href="{% url 'index' %}" class="btn btn-primary mb-2">Home</a>
 			<button type="button" class="btn btn-primary mb-2" data-bs-toggle="modal" data-bs-target="#addTaskModal">Add Daily Task</button>
-			<div class="table-responsive">
-	          <table id="task-table" class="table">
-	            <thead>
-	              <tr>
-	                <th>Num</th>
-	                <th>Title</th>
-	                <th>Description</th>
-	                <th>Created At</th>
-	                <th>Execution Time</th>
-	                <th>Actions</th>
-	              </tr>
-	            </thead>
-	            <tbody>
-	              <!-- Task items will be dynamically populated here -->
-	            </tbody>
-	          </table>
-			</div>
+          <table id="task-table" class="table">
+            <thead>
+              <tr>
+                <th>Num</th>
+                <th>Title</th>
+                <th>Description</th>
+                <th>Created At</th>
+                <th>Execution Time</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <!-- Task items will be dynamically populated here -->
+            </tbody>
+          </table>
         </div>
       </div>
     </div>
@@ -144,6 +144,9 @@
   $(document).ready(function() {
     // DataTable Initialization
 		var dataTable = $('#task-table').DataTable({
+			'scrollY': 'calc(100vh - 300px)', // Adjust the height as needed
+			'scrollCollapse': true,
+	    "scrollX": true,
 		  "ajax": {
 		    "url": "/api/tasks/?daily=true&user_id={{user.id}}", // Replace this with the URL of your API endpoint that returns the JSON 
 		    "dataSrc": "" // Use an empty string since the API returns an array directly
@@ -151,32 +154,29 @@
 		  "columnDefs": [
 		    { "targets": 0,
 		      "createdCell": function (td, cellData, rowData, row, col) {
-		        // Add the "task-num" class to the td element in the first column (index 0)
 		        $(td).addClass("task-num");
-		      }
+		      },
 		  	},
 		    { "targets": 1,
 		      "createdCell": function (td, cellData, rowData, row, col) {
-		        // Add the "task-num" class to the td element in the first column (index 0)
 		        $(td).addClass("task-title");
-		      }
+		      },
+		      "width": "8vw"
 		  	},
 		    { "targets": 4,
 		      "createdCell": function (td, cellData, rowData, row, col) {
-		        // Add the "task-num" class to the td element in the first column (index 0)
 		        $(td).addClass("task-execution-time");
 		      }
 		  	},
-		    { "width": "14vw", "targets": 2 } // Set width of the third column (index 2) to 100px
+		    { "width": "26vw", "targets": 5 },
+		    { "width": "14vw", "targets": 2 }  
 		  ],
 		  "columns": [
 		    { "data": null, "render": function(data, type, row, meta) {
-		      // Use "render" function to display the row number in the first column
 		      return meta.row + 1 ;
 		    }},
 		    { "data": "title" },
 		    { "data": null, "render": function(data, type, row) {
-		      // Use "render" function to display truncated text for description column
 	        return `<div class="task-description">
 	               <p class="truncated-text">${row.description.substring(0, 100)}</p>
 	               ${row.description.length > 100 ? '<a href="#" class="see-more text-decoration-none">See More</a>' : ''}
@@ -185,21 +185,18 @@
 	               </div>`;
 		    }},
 		    { "data": null, "render": function(data, type, row) {
-		      // Use "render" function to display formatted date for created_at column
 		       return row.created_at ? moment(row.created_at).format('MMMM DD, YYYY') : '';
 		    }},
 		    { "data": "execution_time", "render": function(data, type, row) {
 		       return row.execution_time ? moment(row.execution_time, 'HH:mm:ss').format('hh:mm A') : '';
 		    }},
 		    { "data": null, "render": function(data, type, row) {
-		      // Use "render" function to display action buttons in the last column
 	        return `<button class="btn btn-sm btn-primary edit-task" data-bs-toggle="modal" data-bs-target="#editTaskModal" data-task-id="${row.id}">Edit</button>
 	               <button class="btn btn-sm btn-danger delete-task" data-bs-toggle="modal" data-bs-target="#deleteTaskModal" data-task-id="${row.id}" data-task-title="${row.title}">Delete</button>
 	               <button type="submit" class="btn btn-sm btn-success complete-task ${row.completed ? 'complete-button' : ''}" data-task-completed="${row.completed}" data-task-id="${row.id}">${row.completed ? 'uncomplete' : 'complete'}</button>`;
 		    }}
 		  ],
 		  "createdRow": function(row, data, dataIndex) {
-		    // Add necessary attributes to the row during creation
 		    $(row).attr('id', data.id);
 		    $(row).attr('data-id', data.id);
 		    if (data.completed) {

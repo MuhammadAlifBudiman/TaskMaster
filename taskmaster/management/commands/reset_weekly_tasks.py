@@ -7,15 +7,31 @@ class Command(BaseCommand):
     help = 'Reset completed weekly tasks for all users on Monday at 00:00 based on user timezone'
 
     def handle(self, *args, **kwargs):
-        users = UserProfile.objects.all()
-        for user in users:
-            tz = pytz.timezone(user.timezone) # Get user's timezone
-            now = timezone.now().astimezone(tz)
-            today = timezone.now().astimezone(tz).date()
+        """
+        Handle method to reset completed weekly tasks for all users on Monday at 00:00 based on user timezone.
 
-            # Reset weekly tasks on Monday at 00:00
+        Algorithm:
+        1. Retrieve all user profiles.
+        2. Loop through each user profile.
+        3. Convert current datetime to user's timezone.
+        4. Check if the current day is Monday and time is 00:00.
+        5. If it's Monday at 00:00, reset completed weekly tasks for the user.
+        """
+
+        # Step 1: Retrieve all user profiles
+        users = UserProfile.objects.all()
+
+        for user in users:
+            tz = pytz.timezone(user.timezone)  # Step 3: Get user's timezone
+            now = timezone.now().astimezone(tz)  # Step 3: Convert current datetime to user's timezone
+            today = timezone.now().astimezone(tz).date()  # Step 3: Get current date in user's timezone
+
+            # Step 4: Reset weekly tasks on Monday at 00:00
             if now.weekday() == 0 and now.hour == 0 and now.minute == 0:
+                # Retrieve the weekly tasks for the user
                 weekly_tasks = Task.objects.filter(weekly=True, user=user.user)
+
+                # Create task history entries for completed weekly tasks
                 TaskHistory.objects.bulk_create([
                     TaskHistory(
                         user=task.user,
@@ -29,8 +45,7 @@ class Command(BaseCommand):
                     ) for task in weekly_tasks
                 ])
 
+                # Reset completed weekly tasks to mark them as incomplete
                 Task.objects.filter(user=user.user, completed=True, weekly=True).update(completed=False)
 
         self.stdout.write(self.style.SUCCESS('Weekly tasks reset successfully.'))
-
-
