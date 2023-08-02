@@ -1,9 +1,9 @@
 Django
-psycopg2-binary
-python-decouple
-parameterized
-djangorestframework
-djangorestframework-simplejwt
-pytz
-openpyxl
-drf-yasg
+psycopg2-binary==2.9.6
+python-decouple==3.8
+parameterized==0.9.0
+djangorestframework==3.14.0
+djangorestframework-simplejwt==5.2.2
+pytz==2022.1
+openpyxl==3.1.2
+drf-yasg==1.21.7
