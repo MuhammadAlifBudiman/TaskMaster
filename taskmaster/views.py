@@ -1,15 +1,38 @@
+"""
+This module contains the views for the TaskMaster application.
+
+Each view function is responsible for handling specific HTTP requests and rendering appropriate responses.
+The views include functionality for user authentication, task management, and exporting task data.
+"""
+
+# Import necessary modules and functions from Django
+# For rendering templates, redirecting, and fetching objects
 from django.shortcuts import render, redirect, get_object_or_404
+# For user authentication and session management
 from django.contrib.auth import authenticate, login, logout
+# For interacting with the User model
 from django.contrib.auth.models import User
-from django.contrib import messages
+from django.contrib import messages  # For displaying messages to the user
+# For restricting access to authenticated users
 from django.contrib.auth.decorators import login_required
-from openpyxl import Workbook
+
+# Import necessary modules from openpyxl for Excel file generation
+from openpyxl import Workbook  # For creating Excel workbooks
+# For styling Excel cells
 from openpyxl.styles import Font, Alignment, PatternFill, Border, Side
+# For working with Excel column letters
 from openpyxl.utils import get_column_letter
+
+# Import HttpResponse for sending HTTP responses
 from django.http import HttpResponse
-from .forms.forms import *
-from .models import *
+
+# Import forms, models, and serializers from the application
+from .forms.forms import *  # Import all forms from the forms module
+from .models import *  # Import all models from the models module
+# Import all serializers from the serializers module
 from .serializers.serializers import *
+
+# Define the index view function
 
 
 def index(request):
@@ -28,37 +51,46 @@ def index(request):
         return redirect('auth')
 
     # Get the count of completed and total daily tasks for the user
-    completed_daily_tasks = Task.objects.filter(completed=True, daily=True, user=request.user).count()
-    total_daily_tasks = Task.objects.filter(daily=True, user=request.user).count()
+    completed_daily_tasks = Task.objects.filter(
+        completed=True, daily=True, user=request.user).count()
+    total_daily_tasks = Task.objects.filter(
+        daily=True, user=request.user).count()
     remaining_daily_tasks = total_daily_tasks - completed_daily_tasks
 
     # Get the count of completed and total weekly tasks for the user
-    completed_weekly_tasks = Task.objects.filter(completed=True, weekly=True, user=request.user).count()
-    total_weekly_tasks = Task.objects.filter(weekly=True, user=request.user).count()
+    completed_weekly_tasks = Task.objects.filter(
+        completed=True, weekly=True, user=request.user).count()
+    total_weekly_tasks = Task.objects.filter(
+        weekly=True, user=request.user).count()
     remaining_weekly_tasks = total_weekly_tasks - completed_weekly_tasks
 
     # Get the count of completed and total monthly tasks for the user
-    completed_monthly_tasks = Task.objects.filter(completed=True, monthly=True, user=request.user).count()
-    total_monthly_tasks = Task.objects.filter(monthly=True, user=request.user).count()
+    completed_monthly_tasks = Task.objects.filter(
+        completed=True, monthly=True, user=request.user).count()
+    total_monthly_tasks = Task.objects.filter(
+        monthly=True, user=request.user).count()
     remaining_monthly_tasks = total_monthly_tasks - completed_monthly_tasks
 
     # Check if all tasks have been completed and there are tasks to count
-    completed_all_tasks = (completed_daily_tasks + completed_weekly_tasks + completed_monthly_tasks) == (total_daily_tasks + total_weekly_tasks + total_monthly_tasks) and (total_daily_tasks + total_weekly_tasks + total_monthly_tasks) != 0
+    completed_all_tasks = (completed_daily_tasks + completed_weekly_tasks + completed_monthly_tasks) == (total_daily_tasks +
+                                                                                                         total_weekly_tasks + total_monthly_tasks) and (total_daily_tasks + total_weekly_tasks + total_monthly_tasks) != 0
 
     # Pass the task statistics to the template for rendering
-    return render(request, 'taskmaster/index.html', 
-            {
-                'completed_daily_tasks': completed_daily_tasks, 
-                'total_daily_tasks': total_daily_tasks,
-                'remaining_daily_tasks': remaining_daily_tasks,
-                'completed_weekly_tasks': completed_weekly_tasks,
-                'total_weekly_tasks': total_weekly_tasks,
-                'remaining_weekly_tasks': remaining_weekly_tasks,
-                'completed_monthly_tasks': completed_monthly_tasks,
-                'total_monthly_tasks': total_monthly_tasks,
-                'remaining_monthly_tasks': remaining_monthly_tasks,
-                'completed_all_tasks': completed_all_tasks,
-            })
+    return render(request, 'taskmaster/index.html',
+                  {
+                      'completed_daily_tasks': completed_daily_tasks,
+                      'total_daily_tasks': total_daily_tasks,
+                      'remaining_daily_tasks': remaining_daily_tasks,
+                      'completed_weekly_tasks': completed_weekly_tasks,
+                      'total_weekly_tasks': total_weekly_tasks,
+                      'remaining_weekly_tasks': remaining_weekly_tasks,
+                      'completed_monthly_tasks': completed_monthly_tasks,
+                      'total_monthly_tasks': total_monthly_tasks,
+                      'remaining_monthly_tasks': remaining_monthly_tasks,
+                      'completed_all_tasks': completed_all_tasks,
+                  })
+
+# Define the auth_view function
 
 
 def auth_view(request):
@@ -85,6 +117,8 @@ def auth_view(request):
 
     # Render the auth.html template with the login and registration forms
     return render(request, 'taskmaster/auth.html', {'login_form': login_form, 'register_form': register_form})
+
+# Define the login_view function
 
 
 def login_view(request):
@@ -124,27 +158,6 @@ def login_view(request):
         return render(request, 'taskmaster/auth.html', {'login_form': login_form, 'register_form': register_form})
     else:
         # If the request method is GET, display the login and registration forms.
-        login_form = UserLoginForm()
-        register_form = UserRegisterForm()
-
-    return render(request, 'taskmaster/auth.html', {'login_form': login_form, 'register_form': register_form})
-    if request.user.is_authenticated:
-        return redirect('index')
-
-    if request.method == 'POST':
-        login_form = UserLoginForm(data=request.POST)
-        register_form = UserRegisterForm()
-        if login_form.is_valid():
-            user = login_form.get_user()
-            login(request, user)
-            messages.success(request, f'Logged in successfully.')
-            return redirect('index')
-        elif not login_form.has_error('username') and not login_form.has_error('password'):
-            messages.error(request, f'Invalid username or password.')
-            return render(request, 'taskmaster/auth.html', {'login_form': login_form, 'register_form': register_form})
-        else:    
-            return render(request, 'taskmaster/auth.html', {'login_form': login_form, 'register_form': register_form})
-    else:
         login_form = UserLoginForm()
         register_form = UserRegisterForm()
 
@@ -189,7 +202,8 @@ def register_view(request):
             userprofile.save()
 
             # Display success message and redirect to the login page
-            messages.success(request, f'Account created for <b>{username}</b>. You can now log in.')
+            messages.success(
+                request, f'Account created for <b>{username}</b>. You can now log in.')
             return redirect('login')
 
         elif register_form.has_error('password2'):
@@ -197,7 +211,8 @@ def register_view(request):
             register_form.fields['password1'].widget.attrs['class'] = 'is-invalid'
         else:
             # Display error message if an error occurred during registration
-            messages.error(request, f'An error occurred. Please try again later.')
+            messages.error(
+                request, f'An error occurred. Please try again later.')
 
     else:
         # Create instances of the login and registration forms
@@ -219,7 +234,8 @@ def logout_view(request):
 
     """
     logout(request)  # Logs out the current user.
-    messages.success(request, 'Logged out successfully.')  # Displays a success message.
+    # Displays a success message.
+    messages.success(request, 'Logged out successfully.')
     return redirect('auth')  # Redirects to the authentication page.
 
 
@@ -236,12 +252,15 @@ def dailytask(request):
         HttpResponse: The HTTP response object with the rendered dailytask.html template.
     """
     if not request.user.is_authenticated:
-        return redirect('auth')  # Redirects to the authentication page if the user is not authenticated.
+        # Redirects to the authentication page if the user is not authenticated.
+        return redirect('auth')
 
-    form = TaskForm()  # Creates an instance of the TaskForm to be used in the template for adding new tasks.
+    # Creates an instance of the TaskForm to be used in the template for adding new tasks.
+    form = TaskForm()
 
     # Fetching daily tasks from the database for the current authenticated user, ordered by creation time.
-    tasks = Task.objects.filter(daily=True, user=request.user).order_by('created_at')
+    tasks = Task.objects.filter(
+        daily=True, user=request.user).order_by('created_at')
 
     # Counting the number of completed tasks and total tasks for displaying statistics on the template.
     completed_tasks = tasks.filter(completed=True).count()
@@ -279,14 +298,15 @@ def weeklytask(request):
     form = TaskForm()
 
     # Fetch all weekly tasks from the database for the current user, ordered by creation time.
-    tasks = Task.objects.filter(weekly=True, user=request.user).order_by('created_at')
+    tasks = Task.objects.filter(
+        weekly=True, user=request.user).order_by('created_at')
 
     # Count the number of completed weekly tasks.
     completed_tasks = tasks.filter(completed=True).count()
 
     # Count the total number of weekly tasks.
     total_tasks = tasks.count()
-    
+
     # Render the weeklytask.html template with the context data (tasks, completed_tasks, total_tasks, form).
     return render(request, 'taskmaster/weeklytask.html', {
         'tasks': tasks,
@@ -319,19 +339,22 @@ def monthlytask(request):
         - 'form': An instance of the TaskForm to allow adding new tasks.
     """
     if not request.user.is_authenticated:
-        return redirect('auth')  # Redirect to the authentication page if the user is not logged in.
+        # Redirect to the authentication page if the user is not logged in.
+        return redirect('auth')
 
-    form = TaskForm()  # Create an instance of the TaskForm to display on the template.
-    
+    # Create an instance of the TaskForm to display on the template.
+    form = TaskForm()
+
     # Fetching monthly tasks from the database for the authenticated user, ordered by 'created_at'.
-    tasks = Task.objects.filter(monthly=True, user=request.user).order_by('created_at')
-    
+    tasks = Task.objects.filter(
+        monthly=True, user=request.user).order_by('created_at')
+
     # Count the number of completed monthly tasks.
     completed_tasks = tasks.filter(completed=True).count()
-    
+
     # Calculate the total number of monthly tasks.
     total_tasks = tasks.count()
-    
+
     # Render the 'monthlytask.html' template with the task data and the TaskForm instance.
     return render(request, 'taskmaster/monthlytask.html', {'tasks': tasks, 'completed_tasks': completed_tasks, 'total_tasks': total_tasks, 'form': form})
 
@@ -367,7 +390,8 @@ def add_task(request):
             task.save()
 
             # Display a success message using Django's messages framework
-            messages.success(request, f'Task <b>{task.title}</b> has been added')
+            messages.success(
+                request, f'Task <b>{task.title}</b> has been added')
 
             # Redirect the user to the appropriate task page based on the task's frequency
             if task.daily:
@@ -416,7 +440,8 @@ def edit_task(request, task_id):
         if form.is_valid():
             # Save the updated task information to the database
             task = form.save()
-            messages.success(request, f'Task <b>{task.title}</b> has been edited')
+            messages.success(
+                request, f'Task <b>{task.title}</b> has been edited')
             # Redirect based on the task's frequency (daily, weekly, monthly)
             if task.daily:
                 return redirect('dailytask')
@@ -457,7 +482,8 @@ def delete_task(request, task_id):
         if task:
             task_title = task.title
             task.delete()
-            messages.success(request, f'Task <b>{task_title}</b> has been deleted')
+            messages.success(
+                request, f'Task <b>{task_title}</b> has been deleted')
 
         # Redirect the user to the appropriate task list page based on the task type.
         if task.daily:
@@ -490,7 +516,8 @@ def mark_task_complete(request, task_id):
 
         # Show a success message if the task is completed.
         if task.completed:
-            messages.success(request, f'Task "{task.title}" has been completed.')
+            messages.success(
+                request, f'Task "{task.title}" has been completed.')
 
         # Redirect to the appropriate task view page based on the task's frequency.
         if task.daily:
@@ -533,48 +560,59 @@ def export_task_to_excel(request):
             None
         """
         nonlocal row_index
-        sheet.merge_cells(start_row=row_index, start_column=1, end_row=row_index, end_column=len(headers))
+        sheet.merge_cells(start_row=row_index, start_column=1,
+                          end_row=row_index, end_column=len(headers))
         merged_cell = sheet.cell(row=row_index, column=1, value=section_name)
         merged_cell.font = Font(bold=True)
         merged_cell.alignment = Alignment(horizontal='center')
-        merged_cell.fill = PatternFill(start_color='999999', end_color='999999', fill_type='solid')
+        merged_cell.fill = PatternFill(
+            start_color='999999', end_color='999999', fill_type='solid')
 
         for col_index, header in enumerate(headers, start=1):
-            sheet.cell(row=row_index + 1, column=col_index, value=header).font = Font(bold=True)
-            sheet.cell(row=row_index + 1, column=col_index).alignment = Alignment(horizontal='center')
-            sheet.cell(row=row_index + 1, column=col_index).fill = PatternFill(start_color='C0C0C0', end_color='C0C0C0', fill_type='solid')
+            sheet.cell(row=row_index + 1, column=col_index,
+                       value=header).font = Font(bold=True)
+            sheet.cell(
+                row=row_index + 1, column=col_index).alignment = Alignment(horizontal='center')
+            sheet.cell(row=row_index + 1, column=col_index).fill = PatternFill(
+                start_color='C0C0C0', end_color='C0C0C0', fill_type='solid')
             col_letter = get_column_letter(col_index)
-            column_width = len(header) + 2  # Adjust width based on header length
+            # Adjust width based on header length
+            column_width = len(header) + 2
             sheet.column_dimensions[col_letter].width = column_width
         row_index += 2
 
-    
     for task_type in task_types:
         # Create a new sheet for each task type
         sheet = workbook.create_sheet(title=task_type)
 
         # Write headers for each table section
-        headers = ["Date", "Title", "Description", "Execution_time", "Completed"]
+        headers = ["Date", "Title", "Description",
+                   "Execution_time", "Completed"]
 
         row_index = 1
 
         write_section_header(task_type)
 
         # Fetch and populate tasks for each type
-        tasks = TaskHistory.objects.filter(task_type=task_type.lower(), user=request.user)
+        tasks = TaskHistory.objects.filter(
+            task_type=task_type.lower(), user=request.user)
         for task in tasks:
             execution_time = task.execution_time.strftime('%H:%M')
             if task.task_type == 'daily':
-                data = [task.date.strftime('%d-%m-%Y'), task.title, task.description, execution_time, 'yes' if task.completed else 'no']
+                data = [task.date.strftime(
+                    '%d-%m-%Y'), task.title, task.description, execution_time, 'yes' if task.completed else 'no']
             elif task.task_type == 'weekly':
-                data = [task.date.strftime('%d-%m-%Y'), task.title, task.description, f'{task.execution_day}, {execution_time}', 'yes' if task.completed else 'no']
+                data = [task.date.strftime('%d-%m-%Y'), task.title, task.description,
+                        f'{task.execution_day}, {execution_time}', 'yes' if task.completed else 'no']
             else:
-                data = [task.date.strftime('%d-%m-%Y'), task.title, task.description, f'Day {task.execution_date}, {execution_time}', 'yes' if task.completed else 'no']
+                data = [task.date.strftime('%d-%m-%Y'), task.title, task.description,
+                        f'Day {task.execution_date}, {execution_time}', 'yes' if task.completed else 'no']
 
             for col_index, value in enumerate(data, start=1):
                 sheet.cell(row=row_index, column=col_index, value=value)
                 col_letter = get_column_letter(col_index)
-                column_width = len(str(value)) + 2  # Adjust width based on content length
+                # Adjust width based on content length
+                column_width = len(str(value)) + 2
                 if sheet.column_dimensions[col_letter].width < column_width:
                     sheet.column_dimensions[col_letter].width = column_width if column_width < 30 else 30
             row_index += 1
@@ -595,7 +633,8 @@ def export_task_to_excel(request):
     workbook.remove(workbook['Sheet'])
 
     # Create the response with the Excel file
-    response = HttpResponse(content_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+    response = HttpResponse(
+        content_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
     response["Content-Disposition"] = f"attachment; filename=Task_Master_Data_{request.user.username}.xlsx"
     workbook.save(response)
 

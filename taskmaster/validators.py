@@ -1,5 +1,11 @@
+"""
+This module contains custom password validators for Django applications.
+Each validator ensures that a password meets specific criteria, such as containing digits, symbols, uppercase letters, or lowercase letters.
+"""
+
 from django.core.exceptions import ValidationError
 from django.utils.translation import gettext as _
+
 
 class ContainDigitValidator:
     """
@@ -9,6 +15,10 @@ class ContainDigitValidator:
     def validate(self, password, user=None):
         """
         Validate the password to check if it contains at least one digit.
+
+        Args:
+            password (str): The password to validate.
+            user (User, optional): The user object (not used in this validator).
 
         Raises:
             ValidationError: If the password does not contain any digits.
@@ -22,10 +32,11 @@ class ContainDigitValidator:
     def get_help_text(self):
         """
         Return the help text message to inform the user about the validation requirement.
+
+        Returns:
+            str: Help text for the validator.
         """
-        return _(
-            "Your password must contain at least one digit."
-        )
+        return _("Your password must contain at least one digit.")
 
 
 class ContainSymbolValidator:
@@ -36,6 +47,10 @@ class ContainSymbolValidator:
     def validate(self, password, user=None):
         """
         Validate the password to check if it contains at least one symbol.
+
+        Args:
+            password (str): The password to validate.
+            user (User, optional): The user object (not used in this validator).
 
         Raises:
             ValidationError: If the password does not contain any symbols.
@@ -49,10 +64,11 @@ class ContainSymbolValidator:
     def get_help_text(self):
         """
         Return the help text message to inform the user about the validation requirement.
+
+        Returns:
+            str: Help text for the validator.
         """
-        return _(
-            "Your password must contain at least 1 symbol."
-        )
+        return _("Your password must contain at least 1 symbol.")
 
 
 class UppercaseValidator:
@@ -63,6 +79,10 @@ class UppercaseValidator:
     def validate(self, password, user=None):
         """
         Validate the password to check if it contains at least one uppercase letter.
+
+        Args:
+            password (str): The password to validate.
+            user (User, optional): The user object (not used in this validator).
 
         Raises:
             ValidationError: If the password does not contain any uppercase letters.
@@ -76,6 +96,9 @@ class UppercaseValidator:
     def get_help_text(self):
         """
         Return the help text message to inform the user about the validation requirement.
+
+        Returns:
+            str: Help text for the validator.
         """
         return _("Your password must contain at least one uppercase letter.")
 
@@ -89,6 +112,10 @@ class LowercaseValidator:
         """
         Validate the password to check if it contains at least one lowercase letter.
 
+        Args:
+            password (str): The password to validate.
+            user (User, optional): The user object (not used in this validator).
+
         Raises:
             ValidationError: If the password does not contain any lowercase letters.
         """
@@ -101,5 +128,8 @@ class LowercaseValidator:
     def get_help_text(self):
         """
         Return the help text message to inform the user about the validation requirement.
+
+        Returns:
+            str: Help text for the validator.
         """
         return _("Your password must contain at least one lowercase letter.")

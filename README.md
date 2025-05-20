@@ -2,21 +2,23 @@
 
 Task Master is a feature-rich web application that empowers users to efficiently manage their daily, weekly, and monthly tasks. The application offers a seamless user experience with real-time task management capabilities, allowing users to effortlessly add, edit, delete, and mark tasks as complete without the need to refresh the page.
 
-#### Video Demo:[Demo](https://youtu.be/TTgARJFSDxc)
+#### Demo: [Youtube](https://youtu.be/zhIjcGUKfak)
 #### Website: [TaskMaster](https://alif.pythonanywhere.com)
+#### API Docs: [Docs](https://alif.pythonanywhere.com/api/docs)
+#### API Playground: [Playground](https://alif.pythonanywhere.com/api/playground)
 
 ## Features
 
-- **Task Types:** Task Master provides support for daily, weekly, and monthly tasks, enabling users to organize and prioritize their tasks effectively.
-- **API for Task Management:** The application offers a robust API to handle Create, Read, Update, and Delete (CRUD) operations for tasks, complete with input validation for enhanced data integrity.
-- **Interactive Data Tables:** Task lists are displayed using dynamic data tables with built-in functionalities such as pagination, sorting, and searching, making it easy for users to find and access their tasks efficiently.
-- **Smart Task Sorting:** Tasks are intelligently sorted based on completion status and execution time, ensuring that users can effortlessly focus on their pending tasks.
-- **Task Completion Tracking:** A badge prominently displays the number of incomplete tasks, providing users with a quick overview of their pending responsibilities.
-- **Automatic Task Reset:** The application automatically resets daily tasks at 00:00, weekly tasks every Monday at 00:00, and monthly tasks on the 1st day of the month at 00:00, all based on the user's specified timezone.
-- **Secure Registration Form:** The registration form is equipped with validations, including checks for alphanumeric full names, username availability, strong password requirements, and matching passwords.
-- **User-Friendly Login and Registration:** Users can seamlessly register an account and log in using Django views, ensuring a smooth onboarding experience.
-- **Task History:** Completed tasks are automatically saved to the task history, providing users with a comprehensive record of their accomplishments.
-- **Task Export to Excel:** Users can export their tasks to Excel, facilitating easy data sharing and analysis.
+1. **Task Types:** Task Master provides support for daily, weekly, and monthly tasks, enabling users to organize and prioritize their tasks effectively.
+2. **API for Task Management:** The application offers a robust API to handle Create, Read, Update, and Delete (CRUD) operations for tasks, complete with input validation for enhanced data integrity.
+3. **Interactive Data Tables:** Task lists are displayed using dynamic data tables with built-in functionalities such as pagination, sorting, and searching, making it easy for users to find and access their tasks efficiently.
+4. **Smart Task Sorting:** Tasks are intelligently sorted based on completion status and execution time, ensuring that users can effortlessly focus on their pending tasks.
+5. **Task Completion Tracking:** A badge prominently displays the number of incomplete tasks, providing users with a quick overview of their pending responsibilities.
+6. **Automatic Task Reset:** The application automatically resets daily tasks at 00:00, weekly tasks every Monday at 00:00, and monthly tasks on the 1st day of the month at 00:00, all based on the user's specified timezone.
+7. **Secure Registration Form:** The registration form is equipped with validations, including checks for alphanumeric full names, username availability, strong password requirements, and matching passwords.
+8. **User-Friendly Login and Registration:** Users can seamlessly register an account and log in using Django views, ensuring a smooth onboarding experience.
+9. **Task History:** Completed tasks are automatically saved to the task history, providing users with a comprehensive record of their accomplishments.
+10. **Task Export to Excel:** Users can export their tasks to Excel, facilitating easy data sharing and analysis.
 
 ## Tech Stack
 
@@ -103,7 +105,7 @@ Follow the instructions below to set up and run the Task Master web application 
 
 ### Prerequisites
 
-- Python (version 3.10.6)
+- Python (version 3.8) or higher.
 
 ### Installation
 
@@ -163,16 +165,28 @@ pip install -r requirements.txt
    - Run the database migrations:
 
 ```
+python manage.py makemigrations taskmaster
+```
+
+```
 python manage.py migrate
 ```
 
-7. Start the development server:
+7. Set up database seeder (optional):
+    - Change the number of num_tasks_records and num_users_records in `taskmaster/management/command` according to the amount you want
+    - Run database seeder:
+
+```
+python manage.py database_seeder
+```
+
+8. Start the development server:
 
 ```
 python manage.py runserver
 ```
 
-8. Access the application in your web browser:
+9. Access the application in your web browser:
 
 ```
 http://localhost:8000
@@ -239,4 +253,4 @@ This project is licensed under the [MIT License](https://opensource.org/licenses
 
 ## Contact
 
-For any inquiries or feedback, please contact us at taskmaster@example.com.
+For any inquiries or feedback, please contact me at alifm2101@gmail.com.

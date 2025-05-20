@@ -1,6 +1,7 @@
 from django.utils import timezone
 from .models import UserProfile
 
+
 class TimezoneMiddleware:
     """
     Middleware to activate the user's timezone based on their UserProfile settings.
@@ -17,7 +18,9 @@ class TimezoneMiddleware:
     Returns:
         function: The response from the next middleware or the view function.
     """
+
     def __init__(self, get_response):
+        # Initialize the middleware with the next middleware or view function in the chain.
         self.get_response = get_response
 
     def __call__(self, request):
@@ -33,13 +36,20 @@ class TimezoneMiddleware:
         Returns:
             HttpResponse: The response from the next middleware or the view function.
         """
+        # Check if the user is authenticated.
         if request.user.is_authenticated:
-            userprofile, _ = UserProfile.objects.get_or_create(user=request.user)
+            # Retrieve or create a UserProfile for the authenticated user.
+            userprofile, _ = UserProfile.objects.get_or_create(
+                user=request.user)
+
+            # Get the timezone from the user's profile.
             user_timezone = userprofile.timezone
 
-            # Activate the user's timezone
+            # Activate the user's timezone for the current request.
             timezone.activate(user_timezone)
 
+        # Pass the request to the next middleware or view function and get the response.
         response = self.get_response(request)
 
+        # Return the response to the client.
         return response

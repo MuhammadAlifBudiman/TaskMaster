@@ -72,15 +72,15 @@
 </div>
 
 <script>
-  // Set user timezone
-  var userTimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-  fetch('set-timezone/', {
-    method: 'POST',
+  // Set user timezone dynamically using JavaScript
+  var userTimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone; // Get user's timezone
+  fetch("set-timezone/", {
+    method: "POST", // HTTP POST request
     headers: {
-      'Content-Type': 'application/json',
-      'X-CSRFToken':   '{{ csrf_token }}'
+      "Content-Type": "application/json", // Specify JSON content type
+      "X-CSRFToken": "{{ csrf_token }}", // Include CSRF token for security
     },
-    body: JSON.stringify({ timeZone: userTimeZone }),
+    body: JSON.stringify({ timeZone: userTimeZone }), // Send timezone data in request body
   });
 </script>
 {% endblock %}
