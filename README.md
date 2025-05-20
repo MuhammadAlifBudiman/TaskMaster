@@ -2,9 +2,14 @@
 
 Task Master is a feature-rich web application that empowers users to efficiently manage their daily, weekly, and monthly tasks. The application offers a seamless user experience with real-time task management capabilities, allowing users to effortlessly add, edit, delete, and mark tasks as complete without the need to refresh the page.
 
+This project is part of the CS50 course: [HarvardX: CS50's Web Programming with Python and JavaScript](https://www.edx.org/learn/web-development/harvard-university-cs50-s-web-programming-with-python-and-javascript).
+
 #### Demo: [Youtube](https://youtu.be/zhIjcGUKfak)
+
 #### Website: [TaskMaster](https://alif.pythonanywhere.com)
+
 #### API Docs: [Docs](https://alif.pythonanywhere.com/api/docs)
+
 #### API Playground: [Playground](https://alif.pythonanywhere.com/api/playground)
 
 ## Features
@@ -23,12 +28,14 @@ Task Master is a feature-rich web application that empowers users to efficiently
 ## Tech Stack
 
 Front-end:
+
 - HTML: Markup language for creating the structure of web pages.
 - CSS: Styling language for designing the appearance of web pages.
 - JavaScript: Programming language for adding interactivity to web pages.
 - Bootstrap (v5.2.3): Front-end framework for creating responsive and mobile-first web pages.
 
 Back-end:
+
 - Django (v4.2): Python web framework for building the backend of the application.
 - Python libraries:
   - psycopg2-binary (v2.9.6): PostgreSQL database adapter for Python.
@@ -41,6 +48,7 @@ Back-end:
   - drf-yasg (v1.21.7): Yet Another Swagger Generator for Django REST framework.
 
 Front-end Libraries and Plugins (Used in HTML File):
+
 - Font Awesome (latest version): Icon library for adding scalable vector icons.
 - Unicons (v2.1.9): Icon library for adding icons to the user interface.
 - jQuery (v3.7.0): JavaScript library for simplifying DOM manipulation and event handling.
@@ -140,6 +148,7 @@ DEBUG=True
 # Allowed hosts (comma-separated list)
 ALLOWED_HOSTS=localhost,127.0.0.1
 ```
+
 4. Generate a new Django `SECRET_KEY`:
 
 For security reasons, each contributor should generate their own unique `SECRET_KEY`. You can generate a new key by running the following Python code in your terminal:
@@ -173,8 +182,8 @@ python manage.py migrate
 ```
 
 7. Set up database seeder (optional):
-    - Change the number of num_tasks_records and num_users_records in `taskmaster/management/command` according to the amount you want
-    - Run database seeder:
+   - Change the number of num_tasks_records and num_users_records in `taskmaster/management/command` according to the amount you want
+   - Run database seeder:
 
 ```
 python manage.py database_seeder
